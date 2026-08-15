@@ -14,4 +14,8 @@ module.exports = {
   CORS_ORIGINS: (process.env.CORS_ORIGIN || 'http://localhost:8080')
     .split(',').map(s => s.trim()).filter(Boolean),
   PUBLIC_BASE_URL: (process.env.PUBLIC_BASE_URL || '').replace(/\/$/, ''),
+  // 内置管理员
+  ADMIN_USERNAME: process.env.ADMIN_USERNAME || 'admin',
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'admin123456',
+  ADMIN_NICKNAME: process.env.ADMIN_NICKNAME || '管理员',
 };

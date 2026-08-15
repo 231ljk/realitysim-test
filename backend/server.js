@@ -5,7 +5,7 @@ const http = require('http');
 const express = require('express');
 const multer = require('multer');
 const config = require('./src/config');
-const { router: authRouter } = require('./src/auth');
+const { router: authRouter, seedAdmin } = require('./src/auth');
 const chatRouter = require('./src/chat');
 const { setupWebSocket } = require('./src/ws');
 
@@ -63,6 +63,9 @@ app.use((req, res) => res.status(404).json({ error: 'not found' }));
 
 const server = http.createServer(app);
 setupWebSocket(server);
+
+// 启动时确保内置管理员存在
+seedAdmin();
 
 server.listen(config.PORT, () => {
   console.log(`[realitysim-backend] listening on http://0.0.0.0:${config.PORT}`);

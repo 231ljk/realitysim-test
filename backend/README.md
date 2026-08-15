@@ -1,10 +1,24 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 698792bbe4e82ee6ccb56d3c5baba08b_90c01ba5987211f18cca525400e6dd8f
+    ReservedCode1: 700yiDBCYZoSPuGBpjSJ1HScw+8mwLMlGINNr9D+vz9RFSi/uIsOjLDqleJnpb4IkZ0XgZuiGCVkUY3vDgX4lIRIdzOUBl2SBYfoF9+9hWwkBs6Kki2ss5FKSAHENUk6GNlmLLFH2bhBZunPp+yloXkOlR5bvlxik9VA+AAib/aKdjkP8qO+vED7J+M=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 698792bbe4e82ee6ccb56d3c5baba08b_90c01ba5987211f18cca525400e6dd8f
+    ReservedCode2: 700yiDBCYZoSPuGBpjSJ1HScw+8mwLMlGINNr9D+vz9RFSi/uIsOjLDqleJnpb4IkZ0XgZuiGCVkUY3vDgX4lIRIdzOUBl2SBYfoF9+9hWwkBs6Kki2ss5FKSAHENUk6GNlmLLFH2bhBZunPp+yloXkOlR5bvlxik9VA+AAib/aKdjkP8qO+vED7J+M=
+---
+
 # 现实模拟 RealitySim 后端
 
 官方后端服务：账号认证 + 聊天通信（REST + WebSocket）。代码托管于 GitHub，可一键 Docker 部署到任意服务器（含老电脑 Linux + 宝塔方案）。
 
 ## 功能
 
-- 账号注册 / 登录（JWT，7 天有效）
+- 账号注册 / 登录（JWT，7 天有效），支持 **用户名 / 手机号 / 邮箱** 三种登录标识
+- 已登录用户可绑定手机号 / 邮箱（`POST /api/auth/bind`）
+- **内置管理员账号**（首次启动自动创建，默认 `admin / admin123456`，可经 `.env` 配置）
+- 管理员接口：用户列表 `GET /api/auth/admin/users`
 - 会话列表、历史消息拉取（增量 `after` 游标）
 - 文字 / 图片 / 语音消息（REST 发送 + WebSocket 实时推送）
 - 图片 / 语音文件上传（20MB 上限，静态托管 `/uploads/`）
@@ -25,9 +39,11 @@ npm start
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| POST | `/api/auth/register` | 注册 `{username, password, nickname, avatar?}` → `{token, user}` |
-| POST | `/api/auth/login` | 登录 `{username, password}` → `{token, user}` |
+| POST | `/api/auth/register` | 注册 `{username?/phone?/email?, password, nickname, avatar?}` → `{token, user}`，三种登录标识至少一个 |
+| POST | `/api/auth/login` | 登录 `{login, password}`，login 可为用户名/手机号/邮箱任一 → `{token, user}` |
 | GET | `/api/auth/me` | 当前用户信息（Bearer Token） |
+| POST | `/api/auth/bind` | 绑定手机号/邮箱 `{phone?, email?}`（至少一个） |
+| GET | `/api/auth/admin/users` | 用户列表（仅管理员） |
 | POST | `/api/chat/conversations` | 创建会话 `{memberIds: [其他用户id数组]}` |
 | GET | `/api/chat/conversations` | 我的会话列表（含成员与最后一条消息） |
 | GET | `/api/chat/conversations/:id/messages?after=N` | 历史消息增量拉取 |
@@ -91,3 +107,4 @@ backend/
 - [ ] 好友 / 群组管理
 - [ ] 未读数与已读回执
 - [ ] 消息持久化迁移 PostgreSQL（可选）
+*（内容由AI生成，仅供参考）*
