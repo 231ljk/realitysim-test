@@ -1,0 +1,24 @@
+# 环境与密钥
+.env
+.env.local
+
+# 数据库（运行时生成，初始库由 db.py 自动建表）
+data/
+*.db
+*.sqlite
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# 日志与测试产物
+*.log
+smoke_test.py
+ws_test*.py
+cleanup_test_data.py
+err*.txt
+out*.txt
+ws_*.txt
