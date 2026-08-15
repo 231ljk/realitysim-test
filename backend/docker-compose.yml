@@ -1,0 +1,16 @@
+# 现实模拟后端一键启动（适用于宝塔 / 任意 Docker 环境）
+# 用法：
+#   1. cp .env.example .env  并修改 JWT_SECRET
+#   2. docker compose up -d
+services:
+  realitysim-backend:
+    build: .
+    container_name: realitysim-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
