@@ -28,6 +28,7 @@ npm start
 | POST | `/api/auth/register` | 注册 `{username, password, nickname, avatar?}` → `{token, user}` |
 | POST | `/api/auth/login` | 登录 `{username, password}` → `{token, user}` |
 | GET | `/api/auth/me` | 当前用户信息（Bearer Token） |
+| POST | `/api/chat/conversations` | 创建会话 `{memberIds: [其他用户id数组]}` |
 | GET | `/api/chat/conversations` | 我的会话列表（含成员与最后一条消息） |
 | GET | `/api/chat/conversations/:id/messages?after=N` | 历史消息增量拉取 |
 | POST | `/api/chat/conversations/:id/messages` | 发送消息 `{type: text\|image\|voice, content, duration?}` |
