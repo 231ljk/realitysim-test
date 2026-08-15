@@ -373,6 +373,15 @@
     }
     .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
     .copy-btn.copied { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+    .command-list { padding: var(--gap-md); display: flex; flex-direction: column; gap: var(--gap-md); }
+    .cmd-block { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+    .cmd-block-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .cmd-platform { font-size: 13px; font-weight: 600; color: var(--fg); }
+    .cmd-badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+    .cmd-badge-official { color: #00d67d; background: rgba(0,214,125,0.12); border: 1px solid rgba(0,214,125,0.35); }
+    .cmd-badge-mirror { color: #79c0ff; background: rgba(121,192,255,0.12); border: 1px solid rgba(121,192,255,0.35); }
+    .cmd-block .copy-btn { margin-top: 0; margin-left: auto; padding: 5px 12px; font-size: 12px; }
+    .cmd-block .command-line { font-size: 12.5px; background: #0d1320; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
 
     .version-bar {
       display: flex; align-items: center; justify-content: center; gap: var(--gap-xl); flex-wrap: wrap;
@@ -624,6 +633,197 @@
       .hero-cta { flex-direction: column; width: 100%; }
       .hero-cta .btn { width: 100%; }
     }
+
+    /* ════════════════════════════════════════════════════════════════
+       auth（登录 / 注册）
+    ════════════════════════════════════════════════════════════════ */
+    .auth-wrap { max-width: 440px; margin: 0 auto; }
+    .auth-card {
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-xl); padding: clamp(22px, 4vw, 34px);
+      box-shadow: var(--shadow-card);
+    }
+    .auth-tabs { display: flex; gap: 6px; margin-bottom: var(--gap-lg); background: var(--bg-2); padding: 5px; border-radius: 12px; border: 1px solid var(--border-soft); }
+    .auth-tab {
+      flex: 1; appearance: none; border: 0; background: transparent; color: var(--muted);
+      padding: 9px 0; border-radius: 9px; font-weight: 600; font-size: 14px; cursor: pointer;
+      transition: all 0.16s var(--ease);
+    }
+    .auth-tab.active { background: var(--accent); color: var(--bg); }
+    .auth-tab:not(.active):hover { color: var(--fg); background: var(--surface-light); }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; animation: pageIn 0.25s var(--ease); }
+    .avatar-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .avatar-opt {
+      width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+      font-size: 22px; cursor: pointer; background: var(--surface-light);
+      border: 2px solid var(--border); transition: all 0.15s ease;
+    }
+    .avatar-opt:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .avatar-opt.picked { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .color-opt { width: 30px; height: 30px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; transition: transform 0.15s ease; }
+    .color-opt:hover { transform: scale(1.12); }
+    .color-opt.picked { border-color: var(--fg); box-shadow: 0 0 0 2px var(--accent); }
+    .auth-foot { text-align: center; font-size: 13px; color: var(--muted); margin-top: var(--gap-md); }
+    .auth-link { color: var(--accent); cursor: pointer; background: none; border: 0; padding: 0; font-size: 13px; }
+    .auth-link:hover { text-decoration: underline; }
+    .auth-banner {
+      display: flex; align-items: center; gap: 12px; margin-bottom: var(--gap-lg);
+      background: var(--accent-soft); border: 1px solid rgba(0, 214, 125, 0.25);
+      border-radius: var(--radius); padding: 12px 16px; font-size: 13px; color: var(--accent);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       nav user area
+    ════════════════════════════════════════════════════════════════ */
+    .nav-user { display: flex; align-items: center; gap: 10px; flex: none; }
+    .nav-user-info { display: flex; align-items: center; gap: 8px; }
+    .nav-user-avatar {
+      width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+      font-size: 16px; background: var(--surface-light); border: 1px solid var(--accent);
+    }
+    .nav-user-nick { font-size: 13px; color: var(--fg); max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-user-btn { appearance: none; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 12px; padding: 5px 10px; border-radius: 8px; cursor: pointer; transition: all 0.15s ease; }
+    .nav-user-btn:hover { color: var(--danger); border-color: var(--danger); }
+    @media (max-width: 860px) {
+      .nav-user { gap: 8px; }
+      .nav-user-nick { max-width: 70px; }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       chat（聊天室）
+    ════════════════════════════════════════════════════════════════ */
+    .chat-layout {
+      display: grid; grid-template-columns: 320px 1fr; gap: var(--gap-md);
+      height: min(72vh, 640px); min-height: 480px; margin-top: var(--gap-md);
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-card);
+    }
+    .chat-sidebar {
+      display: flex; flex-direction: column; background: var(--bg-2);
+      border-right: 1px solid var(--border-soft);
+    }
+    .chat-sidebar-head { padding: 16px 16px 10px; }
+    .chat-sidebar-head .panel-title { margin-bottom: 8px; }
+    .chat-search input {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 9px 12px; color: var(--fg); font-size: 13px;
+    }
+    .chat-search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .conv-list { flex: 1; overflow-y: auto; padding: 6px; }
+    .conv-item {
+      display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+      background: transparent; border: 0; border-radius: 12px; padding: 12px 10px;
+      cursor: pointer; transition: background 0.15s ease;
+    }
+    .conv-item:hover { background: var(--surface-hover); }
+    .conv-item.active { background: var(--accent-soft); }
+    .conv-avatar { position: relative; flex: none; }
+    .conv-avatar .avatar { width: 46px; height: 46px; font-size: 22px; }
+    .conv-online {
+      position: absolute; right: -1px; bottom: -1px; width: 12px; height: 12px;
+      border-radius: 50%; border: 2px solid var(--bg-2);
+    }
+    .conv-online.on { background: var(--accent); }
+    .conv-online.off { background: var(--muted); }
+    .conv-info { flex: 1; min-width: 0; }
+    .conv-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .conv-name { font-weight: 600; font-size: 14px; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .conv-time { font-size: 11px; color: var(--muted); font-family: var(--font-mono); flex: none; }
+    .conv-last { font-size: 12px; color: var(--muted); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .conv-badge {
+      min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+      background: var(--danger); color: #fff; font-size: 11px; font-weight: 700;
+      display: grid; place-items: center; flex: none;
+    }
+    .chat-main { display: flex; flex-direction: column; min-width: 0; }
+    .chat-main-head {
+      display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+      border-bottom: 1px solid var(--border-soft); background: var(--surface);
+    }
+    .chat-back-btn { display: none; }
+    .chat-title { font-weight: 600; font-size: 15px; }
+    .chat-status { font-size: 12px; color: var(--muted); }
+    .chat-status.on { color: var(--accent); }
+    .chat-msgs { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 4px; background: var(--bg); }
+    .chat-day-divider { text-align: center; margin: 12px 0; }
+    .chat-day-divider span {
+      font-size: 11px; color: var(--muted); background: var(--surface-light);
+      border: 1px solid var(--border-soft); padding: 3px 12px; border-radius: 999px;
+    }
+    .chat-msg { display: flex; gap: 10px; max-width: 78%; margin-top: 8px; }
+    .chat-msg .avatar { width: 34px; height: 34px; font-size: 17px; flex: none; }
+    .chat-msg.mine { align-self: flex-end; flex-direction: row-reverse; }
+    .chat-bubble {
+      background: var(--surface-light); border: 1px solid var(--border-soft);
+      border-radius: 12px 12px 12px 4px; padding: 9px 13px; font-size: 14px;
+      line-height: 1.55; word-break: break-word; max-width: 100%;
+    }
+    .chat-msg.mine .chat-bubble { background: var(--accent-soft); border-color: rgba(0, 214, 125, 0.3); border-radius: 12px 12px 4px 12px; }
+    .chat-msg-meta { font-size: 10px; color: var(--muted); margin-top: 4px; text-align: right; font-family: var(--font-mono); }
+    .chat-msg.mine .chat-msg-meta { text-align: left; }
+    .chat-img {
+      max-width: 220px; max-height: 220px; border-radius: 10px; display: block;
+      cursor: zoom-in; border: 1px solid var(--border-soft);
+    }
+    .chat-img-view {
+      position: fixed; inset: 0; z-index: 500; background: rgba(5, 8, 15, 0.9);
+      display: flex; align-items: center; justify-content: center; padding: 30px; cursor: zoom-out;
+    }
+    .chat-img-view img { max-width: 100%; max-height: 100%; border-radius: 12px; }
+    .voice-bubble { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; min-width: 90px; user-select: none; }
+    .voice-icon { font-size: 16px; color: var(--accent); }
+    .voice-wave { flex: 1; height: 22px; display: flex; align-items: center; gap: 2px; }
+    .voice-wave i { width: 3px; border-radius: 2px; background: var(--accent); opacity: 0.55; }
+    .voice-wave.playing i { animation: voicePulse 0.9s ease-in-out infinite; }
+    .voice-wave.playing i:nth-child(2) { animation-delay: 0.12s; }
+    .voice-wave.playing i:nth-child(3) { animation-delay: 0.24s; }
+    .voice-wave.playing i:nth-child(4) { animation-delay: 0.36s; }
+    @keyframes voicePulse { 0%, 100% { transform: scaleY(0.5); } 50% { transform: scaleY(1.6); } }
+    .voice-time { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+    .chat-input-bar {
+      display: flex; align-items: flex-end; gap: 8px; padding: 12px 14px;
+      border-top: 1px solid var(--border-soft); background: var(--surface);
+    }
+    .chat-tool-btn {
+      appearance: none; border: 1px solid var(--border); background: var(--surface-light);
+      width: 38px; height: 38px; border-radius: 10px; font-size: 17px; cursor: pointer;
+      display: grid; place-items: center; transition: all 0.15s ease; flex: none;
+    }
+    .chat-tool-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .chat-input {
+      flex: 1; background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px 14px; color: var(--fg); font-size: 14px; resize: none; min-height: 38px;
+      max-height: 110px; line-height: 1.5;
+    }
+    .chat-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .chat-record-btn {
+      appearance: none; border: 1px solid var(--border); background: var(--surface-light);
+      height: 38px; border-radius: 12px; padding: 0 18px; font-size: 14px; font-weight: 600;
+      cursor: pointer; color: var(--fg); transition: all 0.15s ease; flex: none;
+    }
+    .chat-record-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .chat-record-btn.recording { border-color: var(--danger); color: var(--danger); background: rgba(255, 71, 87, 0.12); }
+    .chat-tip { padding: 40px 16px; text-align: center; color: var(--muted); font-size: 14px; }
+    .chat-login-gate {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 14px; height: 100%; color: var(--muted); text-align: center; padding: 30px;
+    }
+    .chat-login-gate .es-icon { font-size: 44px; }
+    .chat-empty { padding: 40px 16px; text-align: center; color: var(--muted); font-size: 14px; }
+    .chat-locked {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; margin-bottom: var(--gap-md);
+      background: rgba(255, 165, 2, 0.1); border: 1px solid rgba(255, 165, 2, 0.3);
+      border-radius: var(--radius); color: var(--warning); font-size: 13px;
+    }
+    @media (max-width: 860px) {
+      .chat-layout { grid-template-columns: 1fr; height: min(76vh, 640px); min-height: 520px; }
+      .chat-sidebar { display: none; border-right: 0; border-bottom: 1px solid var(--border-soft); }
+      .chat-sidebar.visible { display: flex; }
+      .chat-main { display: none; }
+      .chat-main.visible { display: flex; }
+      .chat-back-btn { display: inline-flex; }
+    }
   </style>
 </head>
 <body>
@@ -642,9 +842,18 @@
         <button class="nav-link" data-nav="download">下载</button>
         <button class="nav-link" data-nav="community">社区</button>
         <button class="nav-link" data-nav="players">玩家广场</button>
+        <button class="nav-link" data-nav="chat">聊天</button>
       </nav>
+      <div class="nav-user" id="navUser">
+        <button class="btn btn-primary btn-sm nav-cta" data-nav="download">立即下载</button>
+        <div class="nav-user-info" id="navUserInfo" hidden>
+          <span class="nav-user-avatar" id="navUserAvatar" aria-hidden="true">🧑</span>
+          <span class="nav-user-nick" id="navUserNick"></span>
+          <button class="nav-user-btn" id="logoutBtn" type="button">退出</button>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="authEntryBtn" data-nav="auth">登录</button>
+      </div>
       <button class="nav-toggle" id="navToggle" aria-label="打开菜单" aria-expanded="false">☰</button>
-      <button class="btn btn-primary btn-sm nav-cta" data-nav="download">立即下载</button>
     </div>
   </header>
 
@@ -757,13 +966,43 @@
                   <span class="command-dot yellow"></span>
                   <span class="command-dot green"></span>
                 </div>
-                <span id="commandPanelTitle">Terminal — Windows PowerShell</span>
+                <span>Terminal — 命令行一键安装</span>
               </div>
-              <div class="command-body" id="commandBody"></div>
-              <div style="text-align:center; padding-bottom: 16px;">
-                <button class="copy-btn" id="copyBtn">📋 复制命令</button>
+              <div class="command-list">
+                <div class="cmd-block">
+                  <div class="cmd-block-head">
+                    <span class="cmd-platform">Windows</span>
+                    <span class="cmd-badge cmd-badge-official">官方域名</span>
+                    <button class="copy-btn" data-cmd="irm https://dl.xianshimoni.com/install.ps1 | iex">📋 一键复制</button>
+                  </div>
+                  <pre class="command-line">irm https://dl.xianshimoni.com/install.ps1 | iex</pre>
+                </div>
+                <div class="cmd-block">
+                  <div class="cmd-block-head">
+                    <span class="cmd-platform">Windows</span>
+                    <span class="cmd-badge cmd-badge-mirror">备用镜像</span>
+                    <button class="copy-btn" data-cmd="irm https://raw.githubusercontent.com/231ljk/realitysim-test/main/install.ps1 | iex">📋 一键复制</button>
+                  </div>
+                  <pre class="command-line">irm https://raw.githubusercontent.com/231ljk/realitysim-test/main/install.ps1 | iex</pre>
+                </div>
+                <div class="cmd-block">
+                  <div class="cmd-block-head">
+                    <span class="cmd-platform">Linux</span>
+                    <span class="cmd-badge cmd-badge-official">官方域名</span>
+                    <button class="copy-btn" data-cmd="wget -O install.sh https://dl.xianshimoni.com/install/install.sh &amp;&amp; bash install.sh">📋 一键复制</button>
+                  </div>
+                  <pre class="command-line">wget -O install.sh https://dl.xianshimoni.com/install/install.sh &amp;&amp; bash install.sh</pre>
+                </div>
+                <div class="cmd-block">
+                  <div class="cmd-block-head">
+                    <span class="cmd-platform">Linux</span>
+                    <span class="cmd-badge cmd-badge-mirror">备用镜像</span>
+                    <button class="copy-btn" data-cmd="wget -O install.sh https://raw.githubusercontent.com/231ljk/realitysim-test/main/install.sh &amp;&amp; bash install.sh">📋 一键复制</button>
+                  </div>
+                  <pre class="command-line">wget -O install.sh https://raw.githubusercontent.com/231ljk/realitysim-test/main/install.sh &amp;&amp; bash install.sh</pre>
+                </div>
               </div>
-              <p style="text-align:center; font-size:12px; color:var(--muted); padding: 0 16px 16px; margin:0;" id="commandHint"></p>
+              <p style="text-align:center; font-size:12px; color:var(--muted); padding: 0 16px 16px; margin:0;">Windows 在 PowerShell 中执行；Linux 在终端中执行。官方域名走 CDN 加速，备用镜像走 GitHub 直链。</p>
             </div>
           </div>
 
@@ -861,6 +1100,144 @@
       </div>
     </section>
 
+    <!-- ═══════════ PAGE: AUTH ═══════════ -->
+    <section class="page" id="page-auth" data-page="auth">
+      <div class="section">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">ACCOUNT · 账号中心</p>
+            <h2>登录现实模拟社区</h2>
+            <p class="lead">登录后可发帖、评论、私信与加入聊天室，与千万玩家实时交流。</p>
+          </div>
+          <div class="auth-wrap">
+            <div class="auth-banner" id="authBanner" hidden>
+              <span aria-hidden="true">✅</span>
+              <span id="authBannerText"></span>
+            </div>
+            <div class="auth-card">
+              <div class="auth-tabs" role="tablist" aria-label="登录或注册">
+                <button class="auth-tab active" data-auth-tab="login" role="tab" aria-selected="true">登录</button>
+                <button class="auth-tab" data-auth-tab="register" role="tab" aria-selected="false">注册</button>
+              </div>
+
+              <!-- 登录表单 -->
+              <form class="auth-form active" id="loginForm" data-role="login-form" novalidate>
+                <div class="field">
+                  <label for="loginAccount">账号</label>
+                  <input type="text" id="loginAccount" maxlength="32" placeholder="请输入账号" autocomplete="username" required />
+                </div>
+                <div class="field">
+                  <label for="loginPassword">密码</label>
+                  <input type="password" id="loginPassword" maxlength="64" placeholder="请输入密码" autocomplete="current-password" required />
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">登 录</button>
+                <div class="auth-foot">还没有账号？<button type="button" class="auth-link" data-switch-auth="register">立即注册</button></div>
+              </form>
+
+              <!-- 注册表单 -->
+              <form class="auth-form" id="registerForm" data-role="register-form" novalidate>
+                <div class="field">
+                  <label for="regNick">昵称</label>
+                  <input type="text" id="regNick" maxlength="16" placeholder="最多 16 个字符" required />
+                </div>
+                <div class="field">
+                  <label for="regAccount">账号</label>
+                  <input type="text" id="regAccount" maxlength="32" placeholder="用于登录，4-32 位字符" autocomplete="username" required />
+                </div>
+                <div class="field">
+                  <label for="regPassword">密码</label>
+                  <input type="password" id="regPassword" maxlength="64" placeholder="至少 6 位" autocomplete="new-password" required />
+                </div>
+                <div class="field">
+                  <label for="regConfirm">确认密码</label>
+                  <input type="password" id="regConfirm" maxlength="64" placeholder="再次输入密码" autocomplete="new-password" required />
+                </div>
+                <div class="field">
+                  <label>选择头像</label>
+                  <div class="avatar-row" data-role="reg-avatar-row">
+                    <button type="button" class="avatar-opt" data-avatar="🧑">🧑</button>
+                    <button type="button" class="avatar-opt" data-avatar="🐱">🐱</button>
+                    <button type="button" class="avatar-opt" data-avatar="🐶">🐶</button>
+                    <button type="button" class="avatar-opt" data-avatar="🚀">🚀</button>
+                    <button type="button" class="avatar-opt" data-avatar="🎮">🎮</button>
+                    <button type="button" class="avatar-opt" data-avatar="🌟">🌟</button>
+                    <button type="button" class="avatar-opt" data-avatar="🐼">🐼</button>
+                    <button type="button" class="avatar-opt" data-avatar="🦊">🦊</button>
+                    <button type="button" class="avatar-opt" data-avatar="🐯">🐯</button>
+                    <button type="button" class="avatar-opt" data-avatar="🍀">🍀</button>
+                    <button type="button" class="avatar-opt" data-avatar="🎧">🎧</button>
+                    <button type="button" class="avatar-opt" data-avatar="🌙">🌙</button>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>头像底色</label>
+                  <div class="avatar-row" data-role="reg-color-row">
+                    <button type="button" class="color-opt" data-color="#00d67d" style="background:#00d67d;" aria-label="绿色"></button>
+                    <button type="button" class="color-opt" data-color="#58a6ff" style="background:#58a6ff;" aria-label="蓝色"></button>
+                    <button type="button" class="color-opt" data-color="#ffa502" style="background:#ffa502;" aria-label="橙色"></button>
+                    <button type="button" class="color-opt" data-color="#ff4757" style="background:#ff4757;" aria-label="红色"></button>
+                    <button type="button" class="color-opt" data-color="#a29bfe" style="background:#a29bfe;" aria-label="紫色"></button>
+                    <button type="button" class="color-opt" data-color="#55efc4" style="background:#55efc4;" aria-label="青色"></button>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">注 册</button>
+                <div class="auth-foot">已有账号？<button type="button" class="auth-link" data-switch-auth="login">去登录</button></div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ PAGE: CHAT ═══════════ -->
+    <section class="page" id="page-chat" data-page="chat">
+      <div class="section" style="padding-block: clamp(30px, 5vw, 56px);">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">CHAT · 实时聊天室</p>
+            <h2>和玩家们聊聊人生</h2>
+            <p class="lead">支持文字、图片、语音消息，会话列表一键切换。登录后即可加入聊天。</p>
+          </div>
+
+          <div class="chat-locked" id="chatLockedBar" hidden>
+            <span aria-hidden="true">🔒</span>
+            <span>您还未登录，当前只能查看会话，登录后才能发送消息。<button class="auth-link" data-nav="auth">去登录 →</button></span>
+          </div>
+
+          <div class="chat-layout" id="chatLayout">
+            <!-- 会话列表 -->
+            <aside class="chat-sidebar" id="chatSidebar" aria-label="会话列表">
+              <div class="chat-sidebar-head">
+                <div class="panel-title" style="margin-bottom:10px;">💬 消息</div>
+                <div class="chat-search">
+                  <input type="search" id="convSearch" placeholder="搜索会话…" aria-label="搜索会话" />
+                </div>
+              </div>
+              <div class="conv-list" id="convList" aria-live="polite"></div>
+            </aside>
+
+            <!-- 聊天窗口 -->
+            <div class="chat-main" id="chatMain">
+              <div class="chat-main-head">
+                <button class="btn btn-secondary btn-sm chat-back-btn" id="chatBackBtn" type="button">← 返回</button>
+                <div>
+                  <div class="chat-title" id="chatTitle">选择会话</div>
+                  <div class="chat-status" id="chatStatus"></div>
+                </div>
+              </div>
+              <div class="chat-msgs" id="chatMsgs"></div>
+              <div class="chat-input-bar" id="chatInputBar">
+                <button class="chat-tool-btn" id="chatImgBtn" type="button" title="发送图片" aria-label="发送图片">🖼️</button>
+                <textarea class="chat-input" id="chatTextInput" rows="1" placeholder="输入消息…" aria-label="输入消息"></textarea>
+                <button class="chat-record-btn" id="chatRecordBtn" type="button">🎤 按住说话</button>
+                <input type="file" id="chatImgFile" accept="image/*" hidden />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ═══════════ CTA ═══════════ -->
     <section class="page" id="page-cta" data-page="cta">
       <div class="section cta-section">
@@ -896,6 +1273,9 @@
   <div class="modal-overlay" id="profileModalOverlay" role="dialog" aria-modal="true" aria-label="编辑我的资料">
     <div class="modal" id="profileModal"></div>
   </div>
+  <div class="modal-overlay" id="imgViewerOverlay" role="dialog" aria-modal="true" aria-label="图片预览">
+    <div class="modal" id="imgViewerBox" style="background:transparent; border:none; box-shadow:none; text-align:center;"></div>
+  </div>
 
   <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
 
@@ -907,20 +1287,20 @@
 ════════════════════════════════════════════════════════════════ */
 const PLATFORMS = [
   {
-    id: 'windows', name: 'Windows', icon: '🪟', desc: 'Win10 / Win11 x64',
-    url: 'https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Windows.zip',
-    file: 'RealitySim_Windows.zip', size: '约 2.4 GB',
-    command: 'winget install --id 231ljk.RealitySim --source "https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Windows.zip"',
+    id: 'windows', name: 'Windows', icon: '🪟', desc: 'Win10 / Win11 x64 · exe 安装向导版',
+    url: 'https://raw.githubusercontent.com/231ljk/realitysim-test/main/RealitySim_Setup_v1.1.0.exe',
+    file: 'RealitySim_Setup_v1.1.0.exe', size: '约 2.4 GB',
+    command: 'irm https://dl.xianshimoni.com/install.ps1 | iex',
     commandTitle: 'Terminal — Windows PowerShell',
-    hint: 'winget 命令安装；或直接下载安装包双击运行。'
+    hint: 'exe 安装向导双击即装；或使用下方命令行一键安装。'
   },
   {
-    id: 'linux', name: 'Linux', icon: '🐧', desc: 'Ubuntu 20.04+ x64',
+    id: 'linux', name: 'Linux', icon: '🐧', desc: 'Ubuntu 20.04+ x64 · 推荐命令行一键安装',
     url: 'https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Linux.tar.gz',
     file: 'RealitySim_Linux.tar.gz', size: '约 2.3 GB',
-    command: 'curl -L -o RealitySim_Linux.tar.gz "https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Linux.tar.gz"\ntar -xzf RealitySim_Linux.tar.gz\ncd RealitySim && ./RealitySim.x86_64',
+    command: 'wget -O install.sh https://dl.xianshimoni.com/install/install.sh && bash install.sh',
     commandTitle: 'Terminal — Linux Bash',
-    hint: '下载后解压，运行 RealitySim.x86_64 即可（需 libstdc++6 与 图形驱动）。'
+    hint: '推荐使用下方命令行一键安装；或下载 tar.gz 解压后运行 RealitySim.x86_64。'
   },
   {
     id: 'android', name: '安卓', icon: '🤖', desc: 'Android 9.0+',
@@ -1041,7 +1421,11 @@ const Store = {
     posts: 'rs_posts',
     messages: 'rs_messages',
     comments: 'rs_comments',
-    likes: 'rs_likes'
+    likes: 'rs_likes',
+    users: 'rs_users',
+    session: 'rs_session',
+    chatConvs: 'rs_chat_convs',
+    chatMsgs: 'rs_chat_msgs'
   },
   load(key, fallback) {
     try {
@@ -1118,6 +1502,27 @@ const SEED_POSTS = [
   }
 ];
 
+/* 种子账号（本地模拟；真实后端上线后由 /api/auth/register 注册） */
+const SEED_USERS = [
+  { account: 'demo', password: '123456', nick: '演示账号', avatar: '🧑', color: '#00d67d' }
+];
+
+/* 种子会话（聊天室；useMock=true 时使用） */
+const SEED_CONVS = [
+  { id: 'conv1', name: '现实模拟官方群', avatar: '🌍', online: true, unread: 0, lastTime: 0 },
+  { id: 'conv2', name: '星河漫步者', avatar: '🌌', online: true, unread: 2, lastTime: 0 },
+  { id: 'conv3', name: '咖啡不加糖', avatar: '☕', online: false, unread: 0, lastTime: 0 }
+];
+const SEED_CHAT_MSGS = [
+  { id: 'm1', convId: 'conv1', from: '官方', to: 'all', type: 'text', content: '欢迎来到现实模拟官方群！这里是玩家交流的大本营，聊攻略、找队友、分享人生故事都可以。', time: Date.now() - 3600e3 * 26 },
+  { id: 'm2', convId: 'conv1', from: '星河漫步者', to: 'all', type: 'text', content: '新版本什么时候更新呀？好想玩太空拓展包。', time: Date.now() - 3600e3 * 25 },
+  { id: 'm3', convId: 'conv1', from: '官方', to: 'all', type: 'text', content: '太空拓展正在内测中，敬请期待！可以先在社区聊聊你的期待～', time: Date.now() - 3600e3 * 24 },
+  { id: 'm4', convId: 'conv1', from: '阿福', to: 'all', type: 'text', content: '有人一起组队开荒吗？我玩的是社交方向，会做饭！', time: Date.now() - 3600e3 * 2 },
+  { id: 'm5', convId: 'conv2', from: '星河漫步者', to: 'me', type: 'text', content: '嗨，看了你在玩家广场的资料，感觉我们品味很像，加个好友呗？', time: Date.now() - 3600e3 * 5 },
+  { id: 'm6', convId: 'conv2', from: 'me', to: '星河漫步者', type: 'text', content: '你好呀！我也喜欢探索类的玩法，多交流～', time: Date.now() - 3600e3 * 4 },
+  { id: 'm7', convId: 'conv3', from: '咖啡不加糖', to: 'me', type: 'text', content: '深夜失眠中，一起聊聊天吗？', time: Date.now() - 3600e3 * 30 }
+];
+
 /* 数据访问 */
 const Data = {
   getProfile() {
@@ -1153,7 +1558,43 @@ const Data = {
   getFollows() { return Store.load(Store.KEY.follows, []); },
   saveFollows(list) { Store.save(Store.KEY.follows, list); },
   getMessages() { return Store.load(Store.KEY.messages, []); },
-  saveMessages(list) { Store.save(Store.KEY.messages, list); }
+  saveMessages(list) { Store.save(Store.KEY.messages, list); },
+
+  /* ── Auth（登录注册，本地模拟 + 后端预留） ── */
+  getUsers() {
+    const users = Store.load(Store.KEY.users, null);
+    if (!users) { Store.save(Store.KEY.users, SEED_USERS); return SEED_USERS; }
+    return users;
+  },
+  saveUsers(users) { Store.save(Store.KEY.users, users); },
+  getSession() { return Store.load(Store.KEY.session, null); },
+  saveSession(s) { Store.save(Store.KEY.session, s); },
+  clearSession() { localStorage.removeItem(Store.KEY.session); },
+  getCurrentUser() {
+    const s = this.getSession();
+    if (!s) return null;
+    const users = this.getUsers();
+    return users.find(u => u.account === s.account) || null;
+  },
+
+  /* ── Chat（聊天室，本地模拟 + 后端预留） ── */
+  getChatConvs() {
+    const convs = Store.load(Store.KEY.chatConvs, null);
+    if (!convs) {
+      const now = Date.now();
+      const seeded = SEED_CONVS.map(c => ({ ...c, lastTime: now - 3600e3 * 6 }));
+      Store.save(Store.KEY.chatConvs, seeded);
+      return seeded;
+    }
+    return convs;
+  },
+  saveChatConvs(convs) { Store.save(Store.KEY.chatConvs, convs); },
+  getChatMsgs() {
+    const msgs = Store.load(Store.KEY.chatMsgs, null);
+    if (!msgs) { Store.save(Store.KEY.chatMsgs, SEED_CHAT_MSGS); return SEED_CHAT_MSGS; }
+    return msgs;
+  },
+  saveChatMsgs(msgs) { Store.save(Store.KEY.chatMsgs, msgs); }
 };
 
 /* ════════════════════════════════════════════════════════════════
@@ -1210,11 +1651,8 @@ const Render = {
   downloadPanel() {
     const p = currentPlatform;
     $('#mainDownloadIcon').textContent = p.icon;
-    $('#mainDownloadText').textContent = `下载 ${p.name} 安装包`;
+    $('#mainDownloadText').textContent = p.id === 'windows' ? '下载 Windows 安装包 (.exe)' : `下载 ${p.name} 安装包`;
     $('#mainDownloadBtn').dataset.platformUrl = p.url;
-    $('#commandPanelTitle').textContent = p.commandTitle;
-    $('#commandBody').innerHTML = formatCommand(p.command);
-    $('#commandHint').textContent = p.hint;
   },
   features() {
     $('#featureList').innerHTML = FEATURES.map(f => `
@@ -1375,13 +1813,514 @@ const Render = {
           ${escapeHtml(m.content)}
         </div>`;
     }).join('') : `<div class="empty-state"><div class="es-icon">📭</div>暂无私信，去找个朋友聊聊吧</div>`;
+  },
+
+  /* ── Auth 登录态渲染 ── */
+  navUser() {
+    const user = Data.getCurrentUser();
+    const infoEl = $('#navUserInfo');
+    const entryBtn = $('#authEntryBtn');
+    if (user) {
+      $('#navUserAvatar').textContent = user.avatar || '🧑';
+      $('#navUserNick').textContent = user.nick;
+      infoEl.hidden = false;
+      entryBtn.hidden = true;
+    } else {
+      infoEl.hidden = true;
+      entryBtn.hidden = false;
+    }
+  },
+  authPage() {
+    const user = Data.getCurrentUser();
+    if (user) {
+      $('#authBanner').hidden = false;
+      $('#authBannerText').textContent = `已登录：${user.nick}，欢迎回来！你可以直接去发帖或进入聊天室。`;
+    } else {
+      $('#authBanner').hidden = true;
+    }
+  },
+
+  /* ── Chat 渲染 ── */
+  chatList() {
+    const convs = Data.getChatConvs();
+    const msgs = Data.getChatMsgs();
+    const me = Data.getCurrentUser();
+    const myNick = me ? me.nick : '游客';
+    const kw = $('#convSearch').value.trim().toLowerCase();
+    const filtered = convs.filter(c => !kw || c.name.toLowerCase().includes(kw));
+    const sorted = [...filtered].sort((a, b) => b.lastTime - a.lastTime);
+
+    if (!sorted.length) {
+      $('#convList').innerHTML = `<div class="chat-empty">没有匹配的会话</div>`;
+      return;
+    }
+
+    $('#convList').innerHTML = sorted.map(c => {
+      const convMsgs = msgs.filter(m => m.convId === c.id);
+      const last = convMsgs[convMsgs.length - 1];
+      const unread = c.unread || 0;
+      return `
+        <button class="conv-item${c.id === Chat.currentConvId ? ' active' : ''}" data-action="open-conv" data-conv-id="${c.id}">
+          <span class="conv-avatar">
+            <span class="avatar" aria-hidden="true">${c.avatar || '🧑'}</span>
+            <span class="conv-online ${c.online ? 'on' : 'off'}" title="${c.online ? '在线' : '离线'}"></span>
+          </span>
+          <span class="conv-info">
+            <span class="conv-row">
+              <span class="conv-name">${escapeHtml(c.name)}</span>
+              <span class="conv-time">${last ? fmtChatTime(last.time) : ''}</span>
+            </span>
+            <span class="conv-row">
+              <span class="conv-last">${last ? fmtChatPreview(last, myNick) : '暂无消息'}</span>
+              ${unread ? `<span class="conv-badge">${unread}</span>` : ''}
+            </span>
+          </span>
+        </button>`;
+    }).join('');
+  },
+  chatWindow() {
+    const me = Data.getCurrentUser();
+    const convs = Data.getChatConvs();
+    const conv = convs.find(c => c.id === Chat.currentConvId);
+    const msgsBox = $('#chatMsgs');
+    const inputBar = $('#chatInputBar');
+
+    if (!conv) {
+      $('#chatTitle').textContent = '选择会话';
+      $('#chatStatus').textContent = '';
+      msgsBox.innerHTML = `<div class="chat-tip"><div style="font-size:40px; margin-bottom:10px;">💬</div>从左侧选择一个会话开始聊天</div>`;
+      inputBar.style.display = 'none';
+      return;
+    }
+
+    $('#chatTitle').textContent = conv.name;
+    const statusEl = $('#chatStatus');
+    statusEl.textContent = conv.online ? '在线' : '离线';
+    statusEl.className = 'chat-status' + (conv.online ? ' on' : '');
+    inputBar.style.display = '';
+    // 未登录：显示受限提示条，禁用输入
+    const lockedBar = $('#chatLockedBar');
+    const me2 = Data.getCurrentUser();
+    if (me2) {
+      lockedBar.hidden = true;
+      $('#chatTextInput').disabled = false;
+      $('#chatImgBtn').disabled = false;
+      $('#chatRecordBtn').disabled = false;
+    } else {
+      lockedBar.hidden = false;
+      $('#chatTextInput').disabled = true;
+      $('#chatImgBtn').disabled = true;
+      $('#chatRecordBtn').disabled = true;
+    }
+
+    const convMsgs = Data.getChatMsgs().filter(m => m.convId === conv.id);
+    if (!convMsgs.length) {
+      msgsBox.innerHTML = `<div class="chat-empty"><div style="font-size:36px; margin-bottom:10px;">👋</div>打个招呼，开始对话吧</div>`;
+    } else {
+      // 时间分组渲染：同一天的消息归入一组，组间显示日期分隔条
+      let html = '';
+      let lastDayKey = null;
+      convMsgs.forEach(m => {
+        const dayKey = chatDayKey(m.time);
+        if (dayKey !== lastDayKey) {
+          html += `<div class="chat-day-divider"><span>${chatDayLabel(m.time)}</span></div>`;
+          lastDayKey = dayKey;
+        }
+        const mine = m.from === 'me' || (me && (m.from === me.nick));
+        const side = mine ? 'mine' : '';
+        html += `
+          <div class="chat-msg ${side}">
+            <span class="avatar" aria-hidden="true">${m.avatar || (mine ? (me ? me.avatar : '🧑') : (conv.avatar || '🧑'))}</span>
+            <div style="min-width:0; display:flex; flex-direction:column;">
+              <div class="chat-bubble">${renderChatContent(m)}</div>
+              <div class="chat-msg-meta">${fmtChatTime(m.time)}${mine ? '' : ' · ' + escapeHtml(m.from)}</div>
+            </div>
+          </div>`;
+      });
+      msgsBox.innerHTML = html;
+    }
+    msgsBox.scrollTop = msgsBox.scrollHeight;
   }
 };
+
+/* ════════════════════════════════════════════════════════════════
+   4.5 后端 API 配置区（真实后端接入点）
+════════════════════════════════════════════════════════════════ */
+/*
+ * 切换开关：
+ *   useMock = true  → 使用 localStorage 本地模拟（当前演示模式）
+ *   useMock = false → 走真实后端接口（部署后端后切换）
+ *
+ * 真实后端接口约定（REST）：
+ *   POST {BASE_URL}/api/auth/register  注册    body: { account, password, nick, avatar, color }
+ *   POST {BASE_URL}/api/auth/login     登录    body: { account, password } → { token, user }
+ *   POST {BASE_URL}/api/auth/logout    退出    header: Authorization: Bearer <token>
+ *   GET  {BASE_URL}/api/auth/profile   获取当前用户（header: token）
+ *   GET  {BASE_URL}/api/chat/convs     拉取会话列表（header: token）
+ *   GET  {BASE_URL}/api/chat/messages?convId=xxx  拉取消息
+ *   POST {BASE_URL}/api/chat/send      发送消息 body: { convId, type, content }
+ *   POST {BASE_URL}/api/upload         上传图片 / 语音 → { url }
+ *
+ * WebSocket 实时通道（聊天推送）：
+ *   ws://{BASE_URL}/ws/chat  连接后服务端推送消息事件
+ */
+const API_CONFIG = {
+  BASE_URL: 'https://api.realitysim.example.com', // TODO: 部署后替换为真实后端域名
+  useMock: true,
+  WS_URL: 'ws://api.realitysim.example.com/ws/chat' // TODO: 部署后替换；useMock=true 时不建立连接
+};
+
+/* 通用请求封装：useMock=false 时启用，useMock=true 时各 Auth/Chat 方法走本地模拟 */
+async function apiRequest(path, options = {}) {
+  const token = Data.getSession() ? Data.getSession().token : '';
+  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  if (token) headers.Authorization = 'Bearer ' + token;
+  const res = await fetch(API_CONFIG.BASE_URL + path, { ...options, headers });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message || ('请求失败：HTTP ' + res.status));
+  }
+  return res.json();
+}
 
 /* ════════════════════════════════════════════════════════════════
    5. 交互逻辑
 ════════════════════════════════════════════════════════════════ */
 let currentPlatform = PLATFORMS[0];
+
+/* ════════════════════════════════════════════════════════════════
+   5.1 Auth 模块（登录 / 注册 / 登出）
+════════════════════════════════════════════════════════════════ */
+const Auth = {
+  async register({ nick, account, password, avatar, color }) {
+    if (API_CONFIG.useMock) {
+      const users = Data.getUsers();
+      if (users.some(u => u.account === account)) {
+        throw new Error('该账号已被注册');
+      }
+      const user = { account, password, nick, avatar, color };
+      Data.saveUsers([...users, user]);
+      Data.saveSession({ account, token: 'mock-token-' + Store.uid() });
+      return user;
+    }
+    // 真实后端：POST {BASE_URL}/api/auth/register
+    const res = await apiRequest('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ nick, account, password, avatar, color })
+    });
+    Data.saveSession({ account: res.user.account, token: res.token });
+    return res.user;
+  },
+
+  async login(account, password) {
+    if (API_CONFIG.useMock) {
+      const users = Data.getUsers();
+      const user = users.find(u => u.account === account && u.password === password);
+      if (!user) throw new Error('账号或密码错误');
+      Data.saveSession({ account: user.account, token: 'mock-token-' + Store.uid() });
+      return user;
+    }
+    // 真实后端：POST {BASE_URL}/api/auth/login
+    const res = await apiRequest('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ account, password })
+    });
+    Data.saveSession({ account: res.user.account, token: res.token });
+    return res.user;
+  },
+
+  async logout() {
+    if (API_CONFIG.useMock) {
+      Data.clearSession();
+      return;
+    }
+    // 真实后端：POST {BASE_URL}/api/auth/logout
+    try { await apiRequest('/api/auth/logout', { method: 'POST' }); } catch (e) { /* 忽略登出失败 */ }
+    Data.clearSession();
+  }
+};
+
+/* 登录校验：未登录提示并跳转登录页 */
+function requireLogin() {
+  if (Data.getCurrentUser()) return true;
+  toast('请先登录后再操作');
+  navigate('auth');
+  return false;
+}
+
+/* 登录后同步玩家广场资料 */
+function syncProfileFromUser(user) {
+  const profile = Data.getProfile();
+  Data.saveProfile({ ...profile, nick: user.nick, avatar: user.avatar });
+  Data.upsertPlayer({ id: 'me', nick: user.nick, avatar: user.avatar, signature: profile.signature || '这个人很懒，什么都没写', playHours: profile.playHours || 0 });
+}
+
+function switchAuthTab(tab) {
+  $$('[data-auth-tab]').forEach(b => b.classList.toggle('active', b.dataset.authTab === tab));
+  $$('.auth-form').forEach(f => f.classList.toggle('active', f.id === (tab === 'login' ? 'loginForm' : 'registerForm')));
+}
+
+/* ════════════════════════════════════════════════════════════════
+   5.2 Chat 模块（聊天室：本地模拟 + WebSocket 预留）
+════════════════════════════════════════════════════════════════ */
+const Chat = {
+  currentConvId: null,
+
+  /* 打开 / 切换会话 */
+  openConv(convId) {
+    this.currentConvId = convId;
+    const convs = Data.getChatConvs();
+    const conv = convs.find(c => c.id === convId);
+    if (conv && conv.unread) {
+      conv.unread = 0;
+      Data.saveChatConvs(convs);
+    }
+    // 移动端：进入聊天窗口
+    if (window.innerWidth <= 860) {
+      $('#chatSidebar').classList.remove('visible');
+      $('#chatMain').classList.add('visible');
+    }
+    Render.chatList();
+    Render.chatWindow();
+  },
+
+  /* 发送文字消息 */
+  sendText(text) {
+    const me = Data.getCurrentUser();
+    if (!me || !this.currentConvId) return;
+    const content = text.trim();
+    if (!content) return;
+    this.pushMessage({
+      convId: this.currentConvId,
+      from: 'me',
+      avatar: me.avatar || '🧑',
+      type: 'text',
+      content,
+      time: Date.now()
+    });
+    if (API_CONFIG.useMock) {
+      // 本地模拟：对方自动回复，制造"实时"感
+      setTimeout(() => this.mockReply(this.currentConvId), 1200 + Math.random() * 1200);
+    }
+  },
+
+  /* 发送图片消息（base64 本地预览；真实后端改为上传后存 URL） */
+  sendImage(file) {
+    const me = Data.getCurrentUser();
+    if (!me || !this.currentConvId) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.pushMessage({
+        convId: this.currentConvId,
+        from: 'me',
+        avatar: me.avatar || '🧑',
+        type: 'image',
+        content: reader.result,
+        time: Date.now()
+      });
+    };
+    reader.readAsDataURL(file);
+  },
+
+  /* 发送语音消息（模拟录音：存时长与虚拟波形） */
+  sendVoice(duration) {
+    const me = Data.getCurrentUser();
+    if (!me || !this.currentConvId || duration < 0.5) return;
+    this.pushMessage({
+      convId: this.currentConvId,
+      from: 'me',
+      avatar: me.avatar || '🧑',
+      type: 'voice',
+      content: '',
+      duration: Math.round(duration),
+      time: Date.now()
+    });
+  },
+
+  /* 写入一条消息并刷新界面 */
+  pushMessage(msg) {
+    const msgs = Data.getChatMsgs();
+    msgs.push({ id: Store.uid(), ...msg });
+    Data.saveChatMsgs(msgs);
+    const convs = Data.getChatConvs();
+    const conv = convs.find(c => c.id === msg.convId);
+    if (conv) {
+      conv.lastTime = msg.time;
+      Data.saveChatConvs(convs);
+    }
+    Render.chatList();
+    if (this.currentConvId === msg.convId) Render.chatWindow();
+  },
+
+  /* 本地模拟：对方自动回复（useMock=true 时触发；真实后端由 WebSocket 推送） */
+  mockReply(convId) {
+    const convs = Data.getChatConvs();
+    const conv = convs.find(c => c.id === convId);
+    if (!conv) return;
+    const replies = [
+      '哈哈，说到点上了！',
+      '我也这么觉得，握手。',
+      '要不要一起开黑试试？',
+      '这个思路不错，回头我也试试。',
+      '在的，刚看到。',
+      '👍 安排！'
+    ];
+    const reply = replies[Math.floor(Math.random() * replies.length)];
+    const msgs = Data.getChatMsgs();
+    msgs.push({
+      id: Store.uid(),
+      convId,
+      from: conv.name,
+      avatar: conv.avatar || '🧑',
+      type: 'text',
+      content: reply,
+      time: Date.now()
+    });
+    Data.saveChatMsgs(msgs);
+    conv.lastTime = Date.now();
+    // 未读数：当前会话在前台且正在看时不累加
+    if (this.currentConvId !== convId) conv.unread = (conv.unread || 0) + 1;
+    Data.saveChatConvs(convs);
+    Render.chatList();
+    if (this.currentConvId === convId) Render.chatWindow();
+  }
+};
+
+/* WebSocket 预留：useMock=false 时建立实时连接，接收服务端推送 */
+function initChatSocket() {
+  if (API_CONFIG.useMock) return null;
+  const token = Data.getSession() ? Data.getSession().token : '';
+  let ws = null;
+  try {
+    // 连接 ws://后端地址（见 API_CONFIG.WS_URL）
+    ws = new WebSocket(API_CONFIG.WS_URL + '?token=' + encodeURIComponent(token));
+    ws.onopen = () => console.info('[Chat] WebSocket 已连接');
+    ws.onmessage = (ev) => {
+      try {
+        const data = JSON.parse(ev.data);
+        // 服务端推送格式：{ convId, from, avatar, type, content, duration, time }
+        Chat.pushMessage(data);
+      } catch (e) { console.warn('[Chat] 消息解析失败', e); }
+    };
+    ws.onclose = () => console.info('[Chat] WebSocket 已断开');
+    ws.onerror = (e) => console.warn('[Chat] WebSocket 错误', e);
+  } catch (e) {
+    console.warn('[Chat] WebSocket 初始化失败', e);
+  }
+  return ws;
+}
+
+/* ── 聊天辅助：时间 / 预览 / 内容渲染 ── */
+function chatDayKey(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+function chatDayLabel(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diff = Math.round((today - day) / 86400000);
+  if (diff === 0) return '今天';
+  if (diff === 1) return '昨天';
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+}
+
+function fmtChatTime(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  const hm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  if (sameDay) return hm;
+  const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
+  if (d.toDateString() === yesterday.toDateString()) return '昨天 ' + hm;
+  return `${d.getMonth() + 1}/${d.getDate()} ${hm}`;
+}
+
+function fmtChatPreview(m, myNick) {
+  if (m.type === 'image') return '[图片]';
+  if (m.type === 'voice') return '[语音] ' + (m.duration || 0) + '″';
+  const from = (m.from === 'me' || m.from === myNick) ? '' : (m.from + ': ');
+  return from + m.content;
+}
+
+function renderChatContent(m) {
+  if (m.type === 'image') {
+    return `<img class="chat-img" src="${m.content}" alt="聊天图片" data-action="view-chat-img" data-src="${m.content}" />`;
+  }
+  if (m.type === 'voice') {
+    const dur = m.duration || 0;
+    const bars = Array.from({ length: 8 }, () => `<i></i>`).join('');
+    return `<span class="voice-bubble" data-action="play-voice" data-msg-id="${m.id}" data-duration="${dur}">
+      <span class="voice-icon">🔊</span>
+      <span class="voice-wave" data-role="voice-wave">${bars}</span>
+      <span class="voice-time">${dur}″</span>
+    </span>`;
+  }
+  return escapeHtml(m.content);
+}
+
+/* ── 语音播放（模拟：按时长走进度） ── */
+function playVoice(btn) {
+  if (btn.dataset.playing === '1') {
+    btn.dataset.playing = '0';
+    const wave = btn.querySelector('[data-role="voice-wave"]');
+    if (wave) wave.classList.remove('playing');
+    clearTimeout(btn._voiceTimer);
+    return;
+  }
+  btn.dataset.playing = '1';
+  const wave = btn.querySelector('[data-role="voice-wave"]');
+  if (wave) wave.classList.add('playing');
+  const duration = Number(btn.dataset.duration || 3) * 1000;
+  clearTimeout(btn._voiceTimer);
+  btn._voiceTimer = setTimeout(() => {
+    btn.dataset.playing = '0';
+    if (wave) wave.classList.remove('playing');
+  }, duration);
+}
+
+/* ── 录音模拟（按住说话） ── */
+function bindRecordButton() {
+  const btn = $('#chatRecordBtn');
+  let startTs = 0;
+  let timer = null;
+
+  function start(e) {
+    e.preventDefault();
+    if (!Data.getCurrentUser()) { toast('请先登录'); return; }
+    startTs = Date.now();
+    btn.classList.add('recording');
+    btn.textContent = '⏺ 松开结束';
+    const tick = () => {
+      const secs = Math.floor((Date.now() - startTs) / 1000);
+      btn.textContent = '⏺ ' + secs + 's 松开结束';
+      timer = setTimeout(tick, 300);
+    };
+    tick();
+  }
+  function stop() {
+    if (!btn.classList.contains('recording')) return;
+    btn.classList.remove('recording');
+    clearTimeout(timer);
+    const duration = (Date.now() - startTs) / 1000;
+    btn.textContent = '🎤 按住说话';
+    if (duration >= 0.5) {
+      Chat.sendVoice(duration);
+      toast('语音已发送（' + Math.round(duration) + '″）');
+    } else {
+      toast('录音太短，请按住久一点');
+    }
+  }
+
+  btn.addEventListener('mousedown', start);
+  btn.addEventListener('mouseup', stop);
+  btn.addEventListener('mouseleave', stop);
+  btn.addEventListener('touchstart', start, { passive: false });
+  btn.addEventListener('touchend', stop);
+  btn.addEventListener('touchcancel', stop);
+}
+
 
 function formatCommand(cmd) {
   return cmd.split('\n').map(line => {
@@ -1440,6 +2379,7 @@ function renderPostModal(postId) {
 }
 
 function renderMsgModal(playerId, playerNick, playerAvatar) {
+  if (!requireLogin()) return;
   const myProfile = Data.getProfile();
   const all = Data.getMessages();
   const thread = all.filter(m => (m.from === myProfile.nick && m.to === playerNick) || (m.from === playerNick && m.to === myProfile.nick)).sort((a, b) => a.time - b.time);
@@ -1473,6 +2413,7 @@ function renderMsgModal(playerId, playerNick, playerAvatar) {
 }
 
 function renderProfileModal() {
+  if (!requireLogin()) return;
   const p = Data.getProfile();
   const AVATARS = ['🌍', '🐱', '🐶', '🚀', '🎮', '🌟', '🐼', '🦊', '🐯', '🐺', '🍀', '🎧'];
   $('#profileModal').innerHTML = `
@@ -1537,6 +2478,17 @@ function handleAction(e) {
   else if (action === 'edit-profile') {
     renderProfileModal();
   }
+  else if (action === 'open-conv') {
+    Chat.openConv(el.dataset.convId);
+  }
+  else if (action === 'play-voice') {
+    playVoice(el);
+  }
+  else if (action === 'view-chat-img') {
+    const overlay = $('#imgViewerOverlay');
+    $('#imgViewerBox').innerHTML = `<img src="${el.dataset.src}" alt="聊天图片预览" style="max-width:100%; max-height:80vh; border-radius:12px;" />`;
+    openModal('#imgViewerOverlay');
+  }
   else if (action === 'close-modal') {
     const overlay = el.closest('.modal-overlay');
     if (overlay) closeModal('#' + overlay.id);
@@ -1544,6 +2496,7 @@ function handleAction(e) {
 }
 
 function toggleLike(postId) {
+  if (!requireLogin()) return;
   const posts = Data.getPosts();
   const post = posts.find(p => p.id === postId);
   if (!post) return;
@@ -1562,6 +2515,7 @@ function toggleLike(postId) {
 }
 
 function deletePost(postId) {
+  if (!requireLogin()) return;
   const posts = Data.getPosts();
   const post = posts.find(p => p.id === postId);
   const myProfile = Data.getProfile();
@@ -1574,6 +2528,7 @@ function deletePost(postId) {
 }
 
 function toggleFollow(playerId) {
+  if (!requireLogin()) return;
   const follows = Data.getFollows();
   const idx = follows.indexOf(playerId);
   if (idx >= 0) follows.splice(idx, 1);
@@ -1589,6 +2544,7 @@ function toggleFollow(playerId) {
 function bindForms() {
   $('#postForm').addEventListener('submit', (e) => {
     e.preventDefault();
+    if (!requireLogin()) return;
     const title = $('#postTitle').value.trim();
     const content = $('#postContent').value.trim();
     if (!title || !content) { toast('请填写标题和内容'); return; }
@@ -1611,12 +2567,13 @@ function bindForms() {
     toast('发布成功！');
   });
 
-  document.addEventListener('submit', (e) => {
+  document.addEventListener('submit', async (e) => {
     const form = e.target;
     if (form.hasAttribute('data-role')) {
       const role = form.getAttribute('data-role');
       if (role === 'comment-form') {
         e.preventDefault();
+        if (!requireLogin()) return;
         const input = form.querySelector('[data-role="comment-input"]');
         const content = input.value.trim();
         if (!content) { toast('评论不能为空'); return; }
@@ -1633,8 +2590,56 @@ function bindForms() {
         renderPostModal(postId);
         toast('评论已发布');
       }
+      else if (role === 'login-form') {
+        e.preventDefault();
+        const account = $('#loginAccount').value.trim();
+        const password = $('#loginPassword').value;
+        if (!account || !password) { toast('请输入账号和密码'); return; }
+        try {
+          const user = await Auth.login(account, password);
+          syncProfileFromUser(user);
+          Render.navUser();
+          Render.myProfile();
+          Render.players();
+          Render.posts();
+          $('#postAsLabel').textContent = `发布为：${user.nick}`;
+          toast('登录成功，欢迎回来！');
+          navigate('home');
+        } catch (err) {
+          toast(err.message || '登录失败');
+        }
+      }
+      else if (role === 'register-form') {
+        e.preventDefault();
+        const nick = $('#regNick').value.trim();
+        const account = $('#regAccount').value.trim();
+        const password = $('#regPassword').value;
+        const confirm = $('#regConfirm').value;
+        if (!nick || !account || !password) { toast('请填写昵称、账号和密码'); return; }
+        if (account.length < 4) { toast('账号至少 4 位'); return; }
+        if (password.length < 6) { toast('密码至少 6 位'); return; }
+        if (password !== confirm) { toast('两次输入的密码不一致'); return; }
+        const picked = form.querySelector('[data-avatar].picked') || form.querySelector('[data-avatar]');
+        const colorPicked = form.querySelector('[data-color].picked') || form.querySelector('[data-color]');
+        const avatar = picked ? picked.dataset.avatar : '🧑';
+        const color = colorPicked ? colorPicked.dataset.color : '#00d67d';
+        try {
+          const user = await Auth.register({ nick, account, password, avatar, color });
+          syncProfileFromUser(user);
+          Render.navUser();
+          Render.myProfile();
+          Render.players();
+          Render.posts();
+          $('#postAsLabel').textContent = `发布为：${user.nick}`;
+          toast('注册成功，已自动登录！');
+          navigate('home');
+        } catch (err) {
+          toast(err.message || '注册失败');
+        }
+      }
       else if (role === 'msg-form') {
         e.preventDefault();
+        if (!requireLogin()) return;
         const input = form.querySelector('[data-role="msg-input"]');
         const content = input.value.trim();
         if (!content) { toast('私信不能为空'); return; }
@@ -1652,6 +2657,7 @@ function bindForms() {
       }
       else if (role === 'profile-form') {
         e.preventDefault();
+        if (!requireLogin()) return;
         const nick = $('#pfNick').value.trim();
         if (!nick) { toast('昵称不能为空'); return; }
         const picked = form.querySelector('[data-avatar].picked') || form.querySelector('[data-avatar]');
@@ -1692,6 +2698,97 @@ function bindForms() {
 }
 
 function bindGlobal() {
+  /* ── Auth：登录/注册页切换与头像选择 ── */
+  $$('[data-auth-tab]').forEach(btn => {
+    btn.addEventListener('click', () => switchAuthTab(btn.dataset.authTab));
+  });
+  $$('[data-switch-auth]').forEach(btn => {
+    btn.addEventListener('click', () => switchAuthTab(btn.dataset.switchAuth));
+  });
+  document.addEventListener('click', (e) => {
+    const av = e.target.closest('[data-role="reg-avatar-row"] [data-avatar]');
+    if (av) {
+      $$('[data-role="reg-avatar-row"] [data-avatar]').forEach(b => {
+        b.classList.remove('picked');
+        b.style.borderColor = 'var(--border)';
+        b.style.background = 'var(--surface-light)';
+      });
+      av.classList.add('picked');
+      av.style.borderColor = 'var(--accent)';
+      av.style.background = 'var(--accent-soft)';
+    }
+    const cl = e.target.closest('[data-role="reg-color-row"] [data-color]');
+    if (cl) {
+      $$('[data-role="reg-color-row"] [data-color]').forEach(b => {
+        b.classList.remove('picked');
+        b.style.boxShadow = 'none';
+        b.style.transform = 'none';
+      });
+      cl.classList.add('picked');
+      cl.style.boxShadow = '0 0 0 3px rgba(0,214,125,0.35)';
+      cl.style.transform = 'scale(1.15)';
+    }
+  });
+
+  /* ── Auth：退出登录 ── */
+  $('#logoutBtn').addEventListener('click', async () => {
+    await Auth.logout();
+    Render.navUser();
+    Render.authPage();
+    Render.myProfile();
+    Render.players();
+    Render.posts();
+    Render.chatList();
+    Render.chatWindow();
+    $('#postAsLabel').textContent = `发布为：${Data.getProfile().nick}`;
+    toast('已退出登录');
+  });
+
+  /* ── Chat：搜索会话 ── */
+  $('#convSearch').addEventListener('input', () => Render.chatList());
+
+  /* ── Chat：返回会话列表（移动端） ── */
+  $('#chatBackBtn').addEventListener('click', () => {
+    Chat.currentConvId = null;
+    $('#chatMain').classList.remove('visible');
+    $('#chatSidebar').classList.add('visible');
+    Render.chatWindow();
+  });
+
+  /* ── Chat：发送文字（点击按钮 + Enter） ── */
+  $('#chatTextInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const me = Data.getCurrentUser();
+      if (!me) { toast('请先登录再发送消息'); return; }
+      Chat.sendText(e.target.value);
+      e.target.value = '';
+      e.target.style.height = 'auto';
+    }
+  });
+  $('#chatRecordBtn').addEventListener('click', () => {
+    const me = Data.getCurrentUser();
+    if (!me) { toast('请先登录再发送消息'); return; }
+  });
+
+  /* ── Chat：发送图片（选择本地图片预览发送） ── */
+  $('#chatImgBtn').addEventListener('click', () => {
+    const me = Data.getCurrentUser();
+    if (!me) { toast('请先登录再发送消息'); return; }
+    $('#chatImgFile').click();
+  });
+  $('#chatImgFile').addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      if (!/^image\//.test(file.type)) { toast('请选择图片文件'); return; }
+      Chat.sendImage(file);
+    }
+    e.target.value = '';
+  });
+
+  /* ── Chat：录音（按住说话，见 bindRecordButton） ── */
+  bindRecordButton();
+
   /* 平台下载 */
   $('#mainDownloadBtn').addEventListener('click', () => {
     const url = $('#mainDownloadBtn').dataset.platformUrl;
@@ -1703,15 +2800,17 @@ function bindGlobal() {
     $('#commandPanel').classList.toggle('visible');
   });
 
-  /* 复制命令 */
-  $('#copyBtn').addEventListener('click', async () => {
-    const cmd = currentPlatform.command;
+  /* 复制命令（事件委托，支持面板内多个一键复制按钮） */
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-cmd]');
+    if (!btn) return;
+    const cmd = btn.dataset.cmd;
     try {
       await navigator.clipboard.writeText(cmd);
-      const btn = $('#copyBtn');
+      const old = btn.textContent;
       btn.classList.add('copied');
       btn.textContent = '✓ 已复制';
-      setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋 复制命令'; }, 1800);
+      setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1800);
     } catch (err) {
       toast('复制失败，请手动复制');
     }
@@ -1747,7 +2846,7 @@ function bindGlobal() {
 /* ════════════════════════════════════════════════════════════════
    6. 导航路由（hash）
 ════════════════════════════════════════════════════════════════ */
-const NAV_MAP = ['home', 'game', 'download', 'community', 'players'];
+const NAV_MAP = ['home', 'game', 'download', 'community', 'players', 'chat', 'auth'];
 
 function navigate(name) {
   if (!NAV_MAP.includes(name)) name = 'home';
@@ -1760,6 +2859,16 @@ function navigate(name) {
   location.hash = name;
   window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
   if (name === 'players') Render.players();
+  if (name === 'chat') {
+    Render.chatList();
+    Render.chatWindow();
+    // 移动端回到会话列表
+    if (window.innerWidth <= 860) {
+      $('#chatMain').classList.remove('visible');
+      $('#chatSidebar').classList.add('visible');
+    }
+  }
+  if (name === 'auth') Render.authPage();
 }
 
 function routeFromHash() {
@@ -1783,9 +2892,15 @@ function init() {
   Render.players();
   Render.myProfile();
   Render.messages();
+  Render.navUser();
+  Render.authPage();
+  Render.chatList();
+  Render.chatWindow();
   bindForms();
   bindGlobal();
   $('#postAsLabel').textContent = `发布为：${Data.getProfile().nick}`;
+  switchAuthTab('login');
+  initChatSocket();
   routeFromHash();
 }
 
