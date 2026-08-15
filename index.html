@@ -1,58 +1,74 @@
 <!doctype html>
 <!--
-  现实模拟 (RealitySim) - 官方下载站
+  现实模拟 (RealitySim) - 官方下载站 · 终极版
   基于 Unity 中国版（团结引擎）开发
-  版本: v1.0.0
+  版本: v1.1.0（升级版：完整介绍 / 社区 / 玩家广场）
+  纯静态单文件：HTML + CSS + JS，无后端，数据用 localStorage 模拟
 -->
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="现实模拟 - 1:1 还原现实生活的沙盒人生模拟游戏，支持 Windows / Linux / 安卓 / 鸿蒙，免费下载。" />
+  <meta name="theme-color" content="#0a0f1a" />
   <title>现实模拟 - 官方下载站</title>
   <style>
-    /* ─── tokens ───────────────────────────────────────────────────────── */
+    /* ════════════════════════════════════════════════════════════════
+       tokens
+    ════════════════════════════════════════════════════════════════ */
     :root {
       --bg:      #0a0f1a;
+      --bg-2:    #0d1320;
       --surface: #131a2b;
       --surface-light: #1a2438;
+      --surface-hover: #202c44;
       --fg:      #e8ecf4;
       --muted:   #8892a8;
       --border:  #252f44;
+      --border-soft: rgba(37, 47, 68, 0.6);
       --accent:  #00d67d;
       --accent-hover: #00b86b;
       --accent-soft: rgba(0, 214, 125, 0.12);
+      --accent-glow: rgba(0, 214, 125, 0.35);
       --danger:  #ff4757;
       --warning: #ffa502;
-      --fg-soft: rgba(232, 236, 244, 0.06);
+      --info:    #58a6ff;
 
-      /* type */
+      --grad-accent: linear-gradient(135deg, #00d67d 0%, #00a86b 60%, #007a4d 100%);
+      --grad-hero: radial-gradient(60% 50% at 50% 0%, rgba(0, 214, 125, 0.12) 0%, transparent 70%);
+
       --font-display: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       --font-mono:    ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, 'Cascadia Code', monospace;
 
-      /* scale */
-      --fs-h1: clamp(36px, 5vw, 56px);
+      --fs-h1: clamp(34px, 5vw, 58px);
       --fs-h2: clamp(26px, 3.5vw, 40px);
-      --fs-h3: 20px;
+      --fs-h3: 19px;
       --fs-lead: 17px;
       --fs-body: 15px;
       --fs-meta: 13px;
 
-      /* spacing */
       --gap-xs: 8px;
       --gap-sm: 12px;
       --gap-md: 20px;
       --gap-lg: 28px;
       --gap-xl: 48px;
-      --gap-2xl: 80px;
+      --gap-2xl: 72px;
       --container: 1120px;
       --gutter: 24px;
 
       --radius: 10px;
       --radius-lg: 16px;
+      --radius-xl: 22px;
+
+      --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.35);
+      --shadow-pop:  0 12px 40px rgba(0, 0, 0, 0.5);
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    /* ─── reset & base ──────────────────────────────────────────────── */
+    /* ════════════════════════════════════════════════════════════════
+       reset & base
+    ════════════════════════════════════════════════════════════════ */
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
     body {
@@ -61,266 +77,288 @@
       color: var(--fg);
       font-family: var(--font-body);
       font-size: var(--fs-body);
-      line-height: 1.6;
+      line-height: 1.65;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
     img, svg { display: block; max-width: 100%; }
     a { color: inherit; text-decoration: none; }
-    button { font: inherit; cursor: pointer; }
+    button { font: inherit; cursor: pointer; color: inherit; }
+    input, textarea, select { font: inherit; color: inherit; }
     p { text-wrap: pretty; }
     h1, h2, h3, h4 { text-wrap: balance; }
 
-    /* ─── layout primitives ─────────────────────────────────────────── */
-    .container {
-      max-width: var(--container);
-      margin-inline: auto;
-      padding-inline: var(--gutter);
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 4px;
     }
-    .section {
-      padding-block: clamp(40px, 7vw, var(--gap-2xl));
+    .skip-link {
+      position: absolute; left: -9999px; top: 0;
+      background: var(--accent); color: var(--bg);
+      padding: 10px 18px; border-radius: 0 0 10px 0;
+      font-weight: 600; z-index: 300;
     }
-    .section + .section { border-top: 1px solid var(--border); }
+    .skip-link:focus { left: 0; }
+
+    ::selection { background: rgba(0, 214, 125, 0.3); }
+
+    /* 滚动条 */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg-2); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ════════════════════════════════════════════════════════════════
+       layout primitives
+    ════════════════════════════════════════════════════════════════ */
+    .container { max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+    .section { padding-block: clamp(40px, 7vw, var(--gap-2xl)); }
+    .section + .section { border-top: 1px solid var(--border-soft); }
     .stack { display: flex; flex-direction: column; }
     .stack > * + * { margin-top: var(--gap-md); }
     .row { display: flex; align-items: center; gap: var(--gap-md); }
-    .row-between { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-md); }
+    .row-between { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-md); flex-wrap: wrap; }
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap-lg); }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap-lg); }
     .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap-md); }
-    @media (max-width: 900px) {
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 560px) {
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-    }
+    .section-head { text-align: center; max-width: 42ch; margin: 0 auto var(--gap-xl); }
+    @media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
 
-    /* ─── type ──────────────────────────────────────────────────────── */
+    /* type */
     .h1, h1 { font-family: var(--font-display); font-size: var(--fs-h1); line-height: 1.12; letter-spacing: -0.02em; margin: 0; font-weight: 800; }
     .h2, h2 { font-family: var(--font-display); font-size: var(--fs-h2); line-height: 1.15; letter-spacing: -0.015em; margin: 0; font-weight: 700; }
     .h3, h3 { font-size: var(--fs-h3); font-weight: 600; line-height: 1.35; margin: 0; }
-    .lead   { font-size: var(--fs-lead); line-height: 1.6; color: var(--muted); max-width: 58ch; margin: 0; }
+    .lead { font-size: var(--fs-lead); line-height: 1.7; color: var(--muted); max-width: 60ch; margin: 0; }
     .eyebrow {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin: 0 0 var(--gap-md);
-      font-weight: 500;
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent); margin: 0 0 var(--gap-sm); font-weight: 500;
     }
     .meta { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--muted); }
-    .num  { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .muted { color: var(--muted); }
+    .text-center { text-align: center; }
 
-    /* ─── chrome: nav ──────────────────────────────────────────────── */
+    /* ════════════════════════════════════════════════════════════════
+       nav
+    ════════════════════════════════════════════════════════════════ */
     .topnav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(10, 15, 26, 0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 120;
+      background: rgba(10, 15, 26, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border-soft);
     }
-    .topnav-inner { display: flex; align-items: center; justify-content: space-between; padding-block: 14px; }
-    .topnav .logo { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -0.01em; color: var(--fg); display: flex; align-items: center; gap: 10px; }
-    .topnav .logo-icon {
-      width: 32px; height: 32px;
-      background: linear-gradient(135deg, var(--accent), #00a86b);
-      border-radius: 8px;
-      display: grid; place-items: center;
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--bg);
+    .topnav-inner { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-md); padding-block: 12px; }
+    .topnav .logo { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
+    .logo-icon {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: var(--grad-accent);
+      display: grid; place-items: center; font-size: 17px; font-weight: 800; color: var(--bg);
+      box-shadow: 0 4px 14px rgba(0, 214, 125, 0.35);
     }
-    .topnav nav { display: flex; gap: var(--gap-xl); }
-    .topnav nav a,
-    .topnav nav button {
-      appearance: none;
-      border: 0;
-      background: transparent;
-      padding: 0;
-      font: inherit;
-      font-size: 14px;
-      color: var(--muted);
-      cursor: pointer;
-      transition: color 0.15s ease;
+    .topnav nav { display: flex; gap: 4px; align-items: center; }
+    .nav-link {
+      appearance: none; border: 0; background: transparent;
+      padding: 8px 12px; border-radius: 8px;
+      font-size: 14px; color: var(--muted); cursor: pointer;
+      transition: color 0.15s ease, background 0.15s ease;
     }
-    .topnav nav a:hover,
-    .topnav nav button:hover { color: var(--fg); }
-    .pagefoot { padding-block: var(--gap-xl); color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); }
-    .pagefoot .row-between { flex-wrap: wrap; gap: var(--gap-md); }
+    .nav-link:hover { color: var(--fg); background: var(--surface-light); }
+    .nav-link.active { color: var(--accent); background: var(--accent-soft); }
+    .nav-toggle {
+      display: none; appearance: none; border: 1px solid var(--border);
+      background: var(--surface); border-radius: 8px;
+      width: 40px; height: 40px; font-size: 18px; align-items: center; justify-content: center;
+    }
+    @media (max-width: 860px) {
+      .topnav nav {
+        display: none;
+        position: absolute; top: 100%; left: 0; right: 0;
+        flex-direction: column; align-items: stretch; gap: 4px;
+        background: rgba(13, 19, 32, 0.98);
+        border-bottom: 1px solid var(--border);
+        padding: 10px var(--gutter) 16px;
+        box-shadow: var(--shadow-pop);
+      }
+      .topnav nav.open { display: flex; }
+      .nav-toggle { display: inline-flex; }
+      .nav-cta { display: none !important; }
+    }
 
-    /* ─── buttons ───────────────────────────────────────────────────── */
+    /* ════════════════════════════════════════════════════════════════
+       buttons / inputs
+    ════════════════════════════════════════════════════════════════ */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 12px 24px;
-      border-radius: var(--radius);
-      border: 1px solid transparent;
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: -0.005em;
-      transition: all 0.15s ease;
-      white-space: nowrap;
+      padding: 12px 24px; border-radius: var(--radius);
+      border: 1px solid transparent; font-size: 15px; font-weight: 600;
+      letter-spacing: -0.005em; transition: all 0.16s var(--ease); white-space: nowrap;
     }
     .btn:active { transform: translateY(1px); }
-    .btn-primary {
-      background: var(--accent);
-      color: var(--bg);
-      border-color: var(--accent);
-    }
-    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0, 214, 125, 0.3); }
+    .btn-primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 22px rgba(0, 214, 125, 0.35); }
     .btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
     .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-    .btn-ghost { background: transparent; color: var(--muted); border-color: transparent; padding-inline: 8px; }
+    .btn-ghost { background: transparent; color: var(--muted); border-color: transparent; padding-inline: 10px; }
     .btn-ghost:hover { color: var(--accent); }
+    .btn-danger-ghost { background: transparent; color: var(--danger); border-color: transparent; }
+    .btn-danger-ghost:hover { border-color: var(--danger); }
     .btn-lg { padding: 16px 36px; font-size: 17px; border-radius: var(--radius-lg); }
-    .btn-sm { padding: 8px 16px; font-size: 13px; }
+    .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 8px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
 
-    /* ─── hero section ──────────────────────────────────────────────── */
-    .hero { padding-block: clamp(60px, 10vw, 120px); }
-    .hero-center { text-align: center; max-width: 34ch; margin-inline: auto; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--gap-md); }
+    .field label { font-size: 13px; color: var(--muted); font-weight: 500; }
+    .field input, .field textarea, .field select {
+      background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 11px 14px; color: var(--fg); width: 100%; transition: border-color 0.15s ease;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .field textarea { resize: vertical; min-height: 96px; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 999px;
+      background: var(--surface-light); color: var(--muted);
+      border: 1px solid var(--border); font-size: 12px; font-weight: 500;
+    }
+    .badge-accent { background: var(--accent-soft); color: var(--accent); border-color: rgba(0, 214, 125, 0.25); }
+    .badge-warn { background: rgba(255, 165, 2, 0.12); color: var(--warning); border-color: rgba(255, 165, 2, 0.25); }
+
+    /* ════════════════════════════════════════════════════════════════
+       page switching
+    ════════════════════════════════════════════════════════════════ */
+    .page { display: none; }
+    .page.active { display: block; animation: pageIn 0.3s var(--ease); }
+    @keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       hero
+    ════════════════════════════════════════════════════════════════ */
+    .hero { padding-block: clamp(56px, 9vw, 110px); position: relative; overflow: hidden; }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: var(--grad-hero), radial-gradient(50% 40% at 80% 20%, rgba(88, 166, 255, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero .container { position: relative; }
+    .hero-center { text-align: center; max-width: 42ch; margin-inline: auto; }
     .hero h1 { margin-bottom: var(--gap-md); }
+    .hero h1 .grad {
+      background: linear-gradient(120deg, #e8ecf4 10%, #00d67d 55%, #00a86b 90%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
     .hero .lead { margin-bottom: var(--gap-lg); margin-inline: auto; }
     .hero-cta { display: inline-flex; gap: var(--gap-sm); flex-wrap: wrap; justify-content: center; }
 
-    /* Game icon */
     .game-icon {
-      width: 88px; height: 88px;
-      background: linear-gradient(135deg, #00d67d 0%, #00a86b 50%, #007a4d 100%);
-      border-radius: 22px;
+      width: 92px; height: 92px; border-radius: 24px;
+      background: var(--grad-accent);
       margin: 0 auto var(--gap-lg);
-      display: grid; place-items: center;
-      font-size: 40px;
-      box-shadow: 0 8px 32px rgba(0, 214, 125, 0.25), 0 0 0 1px rgba(255,255,255,0.08) inset;
-      position: relative;
-      overflow: hidden;
+      display: grid; place-items: center; font-size: 42px;
+      box-shadow: 0 10px 36px rgba(0, 214, 125, 0.35), 0 0 0 1px rgba(255,255,255,0.1) inset;
+      position: relative; overflow: hidden;
     }
     .game-icon::after {
-      content: '';
-      position: absolute; top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+      content: ''; position: absolute; top: -60%; left: -60%;
+      width: 220%; height: 220%;
+      background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 55%);
     }
-
-    /* Tags */
     .tags { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: var(--gap-lg); }
     .tag {
-      display: inline-flex; align-items: center;
-      padding: 5px 14px;
-      background: var(--surface-light);
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 500;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 5px 14px; background: var(--surface-light); color: var(--muted);
+      border: 1px solid var(--border); border-radius: 999px; font-size: 12px; font-weight: 500;
     }
-    .tag-accent {
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-color: rgba(0, 214, 125, 0.2);
-    }
+    .tag-accent { background: var(--accent-soft); color: var(--accent); border-color: rgba(0, 214, 125, 0.22); }
 
-    /* ─── download section ──────────────────────────────────────────── */
-    .download-section { background: linear-gradient(180deg, var(--bg) 0%, var(--surface) 100%); }
-    .platform-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--gap-md);
-      margin-top: var(--gap-lg);
+    /* 首页快捷统计 */
+    .stat-strip {
+      margin-top: var(--gap-xl);
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap-md);
     }
-    @media (max-width: 800px) {
-      .platform-grid { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 720px) { .stat-strip { grid-template-columns: repeat(2, 1fr); } }
+    .stat-item {
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg); padding: 18px 16px; text-align: center;
     }
-    @media (max-width: 480px) {
-      .platform-grid { grid-template-columns: 1fr; }
+    .stat-num { font-family: var(--font-mono); font-size: 26px; font-weight: 700; color: var(--accent); }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ════════════════════════════════════════════════════════════════
+       announcement bar
+    ════════════════════════════════════════════════════════════════ */
+    .announce-strip {
+      background: var(--accent-soft);
+      border: 1px solid rgba(0, 214, 125, 0.22);
+      border-radius: var(--radius-lg);
+      padding: 14px 20px; margin-top: var(--gap-lg);
+      display: flex; gap: 12px; align-items: flex-start;
     }
+    .announce-strip .ann-icon { font-size: 20px; line-height: 1.4; }
+    .announce-strip .ann-text { font-size: 14px; color: var(--fg); }
+    .announce-strip .ann-text strong { color: var(--accent); }
+
+    /* ════════════════════════════════════════════════════════════════
+       download section
+    ════════════════════════════════════════════════════════════════ */
+    .download-section { background: linear-gradient(180deg, var(--bg) 0%, var(--surface) 130%); }
+    .platform-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap-md); margin-top: var(--gap-lg); }
+    @media (max-width: 800px) { .platform-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 460px) { .platform-grid { grid-template-columns: 1fr; } }
 
     .platform-card {
-      background: var(--surface-light);
-      border: 2px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: var(--gap-lg);
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      position: relative;
+      background: var(--surface-light); border: 2px solid var(--border);
+      border-radius: var(--radius-lg); padding: var(--gap-lg); text-align: center;
+      cursor: pointer; transition: all 0.2s var(--ease); position: relative;
     }
     .platform-card:hover { border-color: var(--accent); transform: translateY(-2px); }
     .platform-card.active {
-      border-color: var(--accent);
-      background: rgba(0, 214, 125, 0.06);
-      box-shadow: 0 0 24px rgba(0, 214, 125, 0.12);
+      border-color: var(--accent); background: rgba(0, 214, 125, 0.06);
+      box-shadow: 0 0 28px rgba(0, 214, 125, 0.14);
     }
     .platform-card.active::before {
-      content: '';
-      position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
-      width: 60px; height: 3px;
-      background: var(--accent);
-      border-radius: 0 0 3px 3px;
+      content: ''; position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
+      width: 60px; height: 3px; background: var(--accent); border-radius: 0 0 3px 3px;
     }
     .platform-icon {
-      width: 48px; height: 48px;
-      margin: 0 auto var(--gap-sm);
-      display: grid; place-items: center;
-      font-size: 28px;
-      background: var(--surface);
-      border-radius: 12px;
-      border: 1px solid var(--border);
+      width: 50px; height: 50px; margin: 0 auto var(--gap-sm);
+      display: grid; place-items: center; font-size: 28px;
+      background: var(--surface); border-radius: 13px; border: 1px solid var(--border);
     }
     .platform-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
     .platform-desc { font-size: 12px; color: var(--muted); }
 
-    /* Download actions */
-    .download-actions {
-      margin-top: var(--gap-xl);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--gap-md);
-    }
-    .action-row {
-      display: flex;
-      gap: var(--gap-md);
-      flex-wrap: wrap;
-      justify-content: center;
-    }
+    .download-actions { margin-top: var(--gap-xl); display: flex; flex-direction: column; align-items: center; gap: var(--gap-md); }
+    .action-row { display: flex; gap: var(--gap-md); flex-wrap: wrap; justify-content: center; }
 
-    /* Command panel */
     .command-panel {
-      width: 100%;
-      max-width: 720px;
-      margin-top: var(--gap-md);
-      background: #0d1320;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      display: none;
+      width: 100%; max-width: 720px; margin-top: var(--gap-md);
+      background: #0d1320; border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden; display: none;
     }
-    .command-panel.visible { display: block; animation: slideDown 0.25s ease; }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .command-panel.visible { display: block; animation: slideDown 0.25s var(--ease); }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
     .command-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 16px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      font-size: 12px; color: var(--muted);
-      font-family: var(--font-mono);
+      padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--border);
+      font-size: 12px; color: var(--muted); font-family: var(--font-mono);
     }
     .command-dots { display: flex; gap: 6px; }
     .command-dot { width: 10px; height: 10px; border-radius: 50%; }
     .command-dot.red { background: #ff5f57; }
     .command-dot.yellow { background: #febc2e; }
     .command-dot.green { background: #28c840; }
-    .command-body {
-      padding: var(--gap-md);
-      font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 1.7;
-      color: #c9d1d9;
-      overflow-x: auto;
-    }
+    .command-body { padding: var(--gap-md); font-family: var(--font-mono); font-size: 13px; line-height: 1.7; color: #c9d1d9; overflow-x: auto; }
     .command-line { margin: 0; white-space: pre-wrap; word-break: break-all; }
     .cmd-keyword { color: #ff7b72; }
     .cmd-string { color: #a5d6ff; }
@@ -328,509 +366,1431 @@
     .cmd-flag { color: #79c0ff; }
     .copy-btn {
       display: inline-flex; align-items: center; gap: 6px;
-      margin-top: var(--gap-sm);
-      padding: 8px 18px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--muted);
-      font-size: 13px;
-      font-family: var(--font-mono);
-      cursor: pointer;
+      margin-top: var(--gap-sm); padding: 8px 18px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      color: var(--muted); font-size: 13px; font-family: var(--font-mono); cursor: pointer;
       transition: all 0.15s ease;
     }
     .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
     .copy-btn.copied { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 
-    /* Version info bar */
     .version-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--gap-xl);
-      flex-wrap: wrap;
-      margin-top: var(--gap-xl);
-      padding: var(--gap-md) var(--gap-lg);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center; gap: var(--gap-xl); flex-wrap: wrap;
+      margin-top: var(--gap-xl); padding: var(--gap-md) var(--gap-lg);
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
       font-size: 13px;
     }
     .version-item { display: flex; align-items: center; gap: 6px; color: var(--muted); }
     .version-item strong { color: var(--fg); }
 
-    /* ─── features ─────────────────────────────────────────────────── */
-    .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap-lg); }
-    @media (max-width: 700px) { .feature-grid { grid-template-columns: 1fr; } }
+    /* ════════════════════════════════════════════════════════════════
+       features / gameplay
+    ════════════════════════════════════════════════════════════════ */
     .feature-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: var(--gap-lg);
-      transition: all 0.2s ease;
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg); padding: var(--gap-lg);
+      transition: all 0.2s var(--ease); box-shadow: var(--shadow-card);
     }
-    .feature-card:hover { border-color: rgba(0, 214, 125, 0.3); }
+    .feature-card:hover { border-color: rgba(0, 214, 125, 0.35); transform: translateY(-3px); }
     .feature-icon {
-      width: 48px; height: 48px;
-      display: grid; place-items: center;
-      background: var(--accent-soft);
-      border-radius: 12px;
-      color: var(--accent);
-      margin-bottom: var(--gap-md);
-      font-size: 22px;
+      width: 48px; height: 48px; display: grid; place-items: center;
+      background: var(--accent-soft); border-radius: 12px; color: var(--accent);
+      margin-bottom: var(--gap-md); font-size: 22px;
     }
     .feature-card h3 { margin-bottom: 8px; }
     .feature-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
 
-    /* ─── system requirements ──────────────────────────────────────── */
+    /* 世界观 */
+    .lore-block {
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-xl); padding: clamp(24px, 4vw, 44px);
+      box-shadow: var(--shadow-card);
+    }
+    .lore-block p { color: var(--muted); font-size: 15px; line-height: 1.85; margin: 0 0 14px; }
+    .lore-block p:last-child { margin-bottom: 0; }
+    .lore-quote {
+      border-left: 3px solid var(--accent); background: var(--accent-soft);
+      padding: 14px 18px; border-radius: 0 12px 12px 0; margin: var(--gap-md) 0;
+      color: var(--fg); font-size: 15px;
+    }
+
+    /* 截图占位 */
+    .screenshot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap-md); }
+    @media (max-width: 860px) { .screenshot-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .screenshot-grid { grid-template-columns: 1fr; } }
+    .shot {
+      aspect-ratio: 16 / 10; border-radius: var(--radius-lg); overflow: hidden;
+      border: 1px solid var(--border); position: relative; cursor: pointer;
+      background:
+        radial-gradient(60% 80% at 30% 20%, rgba(0, 214, 125, 0.18) 0%, transparent 60%),
+        radial-gradient(50% 60% at 80% 70%, rgba(88, 166, 255, 0.14) 0%, transparent 60%),
+        linear-gradient(150deg, var(--surface-light) 0%, var(--surface) 100%);
+      transition: transform 0.2s var(--ease), border-color 0.2s ease;
+    }
+    .shot:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .shot .shot-emoji { position: absolute; inset: 0; display: grid; place-items: center; font-size: 44px; opacity: 0.9; }
+    .shot .shot-label {
+      position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 14px;
+      background: linear-gradient(0deg, rgba(10,15,26,0.85) 0%, transparent 100%);
+      font-size: 12px; color: var(--fg);
+    }
+
+    /* 更新日志 timeline */
+    .changelog { position: relative; padding-left: 24px; }
+    .changelog::before {
+      content: ''; position: absolute; left: 6px; top: 6px; bottom: 6px; width: 2px;
+      background: linear-gradient(180deg, var(--accent) 0%, var(--border) 100%);
+      border-radius: 2px;
+    }
+    .cl-item { position: relative; margin-bottom: var(--gap-lg); }
+    .cl-item::before {
+      content: ''; position: absolute; left: -24px; top: 6px; width: 12px; height: 12px;
+      border-radius: 50%; background: var(--bg); border: 2px solid var(--accent);
+    }
+    .cl-ver { font-family: var(--font-mono); font-size: 13px; color: var(--accent); font-weight: 700; }
+    .cl-date { font-size: 12px; color: var(--muted); margin-left: 8px; }
+    .cl-title { font-weight: 600; margin: 6px 0 4px; }
+    .cl-body { font-size: 13px; color: var(--muted); }
+    .cl-body ul { margin: 6px 0 0; padding-left: 18px; }
+    .cl-body li { margin-bottom: 3px; }
+
+    /* ════════════════════════════════════════════════════════════════
+       system requirements
+    ════════════════════════════════════════════════════════════════ */
     .req-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap-md); }
     @media (max-width: 700px) { .req-grid { grid-template-columns: 1fr; } }
     .req-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: var(--gap-lg);
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg); padding: var(--gap-lg); box-shadow: var(--shadow-card);
     }
     .req-card-header {
       display: flex; align-items: center; gap: 12px;
-      margin-bottom: var(--gap-md);
-      padding-bottom: var(--gap-md);
-      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--gap-md); padding-bottom: var(--gap-md); border-bottom: 1px solid var(--border);
     }
     .req-platform-icon {
-      width: 40px; height: 40px;
-      display: grid; place-items: center;
-      font-size: 24px;
-      background: var(--surface-light);
-      border-radius: 10px;
+      width: 40px; height: 40px; display: grid; place-items: center; font-size: 24px;
+      background: var(--surface-light); border-radius: 10px;
     }
     .req-platform-name { font-weight: 600; font-size: 16px; }
     .req-platform-name span { font-size: 12px; color: var(--muted); font-weight: 400; display: block; }
-    .req-row {
-      display: flex; justify-content: space-between;
-      padding: 8px 0;
-      font-size: 13px;
-      border-bottom: 1px dashed rgba(255,255,255,0.05);
-    }
+    .req-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
     .req-row:last-child { border-bottom: none; }
     .req-label { color: var(--muted); }
-    .req-value { font-family: var(--font-mono); font-size: 12px; color: var(--fg); }
+    .req-value { font-family: var(--font-mono); font-size: 12px; color: var(--fg); text-align: right; }
 
-    /* ─── footer CTA ───────────────────────────────────────────────── */
+    /* ════════════════════════════════════════════════════════════════
+       community
+    ════════════════════════════════════════════════════════════════ */
+    .community-layout { display: grid; grid-template-columns: 1fr 300px; gap: var(--gap-lg); align-items: start; }
+    @media (max-width: 860px) { .community-layout { grid-template-columns: 1fr; } }
+
+    .post-card {
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg); padding: var(--gap-lg); margin-bottom: var(--gap-md);
+      transition: border-color 0.15s ease; cursor: pointer; box-shadow: var(--shadow-card);
+    }
+    .post-card:hover { border-color: rgba(0, 214, 125, 0.35); }
+    .post-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .avatar {
+      width: 40px; height: 40px; border-radius: 50%; flex: none;
+      display: grid; place-items: center; font-size: 20px;
+      background: var(--surface-light); border: 1px solid var(--border);
+    }
+    .avatar.lg { width: 64px; height: 64px; font-size: 30px; }
+    .avatar.sm { width: 30px; height: 30px; font-size: 15px; }
+    .post-author { font-weight: 600; font-size: 14px; }
+    .post-time { font-size: 12px; color: var(--muted); }
+    .post-title { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+    .post-excerpt { font-size: 14px; color: var(--muted); margin-bottom: 12px; line-height: 1.6; }
+    .post-foot { display: flex; gap: 14px; align-items: center; font-size: 13px; color: var(--muted); }
+    .action-btn {
+      appearance: none; border: 0; background: transparent; display: inline-flex; align-items: center; gap: 5px;
+      font-size: 13px; color: var(--muted); cursor: pointer; padding: 5px 8px; border-radius: 8px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+    .action-btn:hover { color: var(--accent); background: var(--accent-soft); }
+    .action-btn.liked { color: var(--accent); }
+    .action-btn.danger { color: var(--danger); }
+    .action-btn.danger:hover { background: rgba(255, 71, 87, 0.12); color: var(--danger); }
+
+    .panel {
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg); padding: var(--gap-lg); box-shadow: var(--shadow-card);
+    }
+    .panel-title { font-weight: 600; font-size: 15px; margin-bottom: var(--gap-md); display: flex; align-items: center; gap: 8px; }
+    .ann-item { padding: 10px 0; border-bottom: 1px dashed rgba(255,255,255,0.06); }
+    .ann-item:last-child { border-bottom: none; }
+    .ann-item h4 { margin: 0 0 3px; font-size: 14px; }
+    .ann-item p { margin: 0; font-size: 13px; color: var(--muted); }
+    .ann-item .meta { font-size: 11px; }
+
+    /* ════════════════════════════════════════════════════════════════
+       players
+    ════════════════════════════════════════════════════════════════ */
+    .player-profile {
+      display: flex; gap: var(--gap-lg); align-items: center; flex-wrap: wrap;
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+      border: 1px solid var(--border-soft); border-radius: var(--radius-xl);
+      padding: clamp(20px, 4vw, 36px); box-shadow: var(--shadow-card);
+    }
+    .player-profile .pp-info { flex: 1; min-width: 220px; }
+    .player-profile .pp-name { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .player-profile .pp-sign { color: var(--muted); font-size: 14px; margin-top: 6px; }
+    .player-profile .pp-stats { display: flex; gap: var(--gap-lg); margin-top: 14px; flex-wrap: wrap; }
+    .pp-stat b { font-family: var(--font-mono); color: var(--accent); font-size: 18px; }
+    .pp-stat span { display: block; font-size: 12px; color: var(--muted); }
+
+    .player-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap-md); }
+    @media (max-width: 720px) { .player-list { grid-template-columns: 1fr; } }
+    .player-card {
+      display: flex; gap: 14px; align-items: center;
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-card);
+      transition: border-color 0.15s ease;
+    }
+    .player-card:hover { border-color: rgba(0, 214, 125, 0.3); }
+    .player-card .pc-info { flex: 1; min-width: 0; }
+    .player-card .pc-name { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .player-card .pc-sign { font-size: 12px; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .player-card .pc-hours { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-top: 4px; }
+
+    .search-bar { display: flex; gap: 10px; margin-bottom: var(--gap-lg); }
+    .search-bar input {
+      flex: 1; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 11px 14px; color: var(--fg);
+    }
+    .search-bar input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+    /* 私信 */
+    .msg-list { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: var(--gap-md); }
+    .msg-bubble {
+      background: var(--surface-light); border: 1px solid var(--border-soft);
+      border-radius: 12px 12px 12px 4px; padding: 10px 14px; max-width: 85%; font-size: 14px;
+    }
+    .msg-bubble .mb-head { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .msg-bubble.mine { align-self: flex-end; background: var(--accent-soft); border-color: rgba(0, 214, 125, 0.25); border-radius: 12px 12px 4px 12px; }
+
+    /* ════════════════════════════════════════════════════════════════
+       modal
+    ════════════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(5, 8, 15, 0.72);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-xl); width: 100%; max-width: 560px;
+      max-height: 86vh; overflow-y: auto; padding: var(--gap-lg);
+      box-shadow: var(--shadow-pop); animation: modalIn 0.25s var(--ease);
+    }
+    .modal.modal-lg { max-width: 680px; }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: none; } }
+    .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: var(--gap-md); }
+    .modal-close {
+      appearance: none; border: 0; background: var(--surface-light); color: var(--muted);
+      width: 32px; height: 32px; border-radius: 8px; font-size: 16px; cursor: pointer;
+      flex: none; transition: all 0.15s ease;
+    }
+    .modal-close:hover { color: var(--fg); background: var(--surface-hover); }
+
+    .toast-wrap { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 400; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+    .toast {
+      background: var(--surface-light); border: 1px solid var(--accent); color: var(--fg);
+      padding: 10px 22px; border-radius: 999px; font-size: 14px; font-weight: 500;
+      box-shadow: var(--shadow-pop); animation: toastIn 0.25s var(--ease);
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    .empty-state { text-align: center; padding: 40px 16px; color: var(--muted); }
+    .empty-state .es-icon { font-size: 40px; margin-bottom: 10px; }
+
+    /* footer */
+    .pagefoot { padding-block: var(--gap-xl); color: var(--muted); font-size: 13px; border-top: 1px solid var(--border-soft); }
+    .pagefoot .row-between { flex-wrap: wrap; gap: var(--gap-md); }
+
     .cta-section { text-align: center; }
-    .cta-section .container { max-width: 600px; }
+    .cta-section .container { max-width: 620px; }
     .cta-section h2 { margin-bottom: 12px; }
     .cta-section .lead { margin-bottom: var(--gap-lg); margin-inline: auto; }
 
-    /* ─── responsive tweaks ────────────────────────────────────────── */
     @media (max-width: 560px) {
       .version-bar { flex-direction: column; gap: var(--gap-sm); }
       .action-row { flex-direction: column; width: 100%; }
       .action-row .btn { width: 100%; }
-      .topnav nav { display: none; }
+      .hero-cta { flex-direction: column; width: 100%; }
+      .hero-cta .btn { width: 100%; }
     }
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
 
   <!-- ═══════════ NAVIGATION ═══════════ -->
-  <header class="topnav" data-section="topnav">
+  <header class="topnav">
     <div class="container topnav-inner">
-      <span class="logo">
-        <span class="logo-icon">现</span>
+      <a class="logo" href="#home" data-nav="home" aria-label="现实模拟 首页">
+        <span class="logo-icon" aria-hidden="true">现</span>
         现实模拟
-      </span>
-      <nav>
-        <a href="#features">游戏介绍</a>
-        <a href="#download">立即下载</a>
-        <a href="#requirements">系统要求</a>
+      </a>
+      <nav id="mainNav" aria-label="主导航">
+        <button class="nav-link active" data-nav="home">首页</button>
+        <button class="nav-link" data-nav="game">游戏介绍</button>
+        <button class="nav-link" data-nav="download">下载</button>
+        <button class="nav-link" data-nav="community">社区</button>
+        <button class="nav-link" data-nav="players">玩家广场</button>
       </nav>
-      <button class="btn btn-primary btn-sm" onclick="document.getElementById('download').scrollIntoView({behavior:'smooth'})">下载游戏</button>
+      <button class="nav-toggle" id="navToggle" aria-label="打开菜单" aria-expanded="false">☰</button>
+      <button class="btn btn-primary btn-sm nav-cta" data-nav="download">立即下载</button>
     </div>
   </header>
 
-  <!-- ═══════════ HERO ═══════════ -->
-  <main id="content">
-  <section class="section hero" data-section="hero">
-    <div class="container hero-center">
-      <div class="game-icon" aria-label="现实模拟游戏图标">🌍</div>
-      <h1>现实模拟</h1>
-      <p class="lead">基于 Unity 中国版（团结引擎）打造<br/>完美模拟现实生活的开放世界游戏</p>
-      <div class="hero-cta">
-        <button class="btn btn-primary btn-lg" onclick="document.getElementById('download').scrollIntoView({behavior:'smooth'})">⬇ 立即下载</button>
-        <button class="btn btn-secondary btn-lg" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">了解详情 →</button>
-      </div>
-      <div class="tags">
-        <span class="tag tag-accent">✓ 官方正版</span>
-        <span class="tag tag-accent">正式版 v1.0.0</span>
-        <span class="tag">🎮 3D 引擎</span>
-        <span class="tag">🌐 开放世界</span>
-        <span class="tag">🐧 Linux 多发行版</span>
-      </div>
-    </div>
-  </section>
+  <main id="main">
 
-  <!-- ═══════════ DOWNLOAD SECTION ═══════════ -->
-  <section class="section download-section" id="download" data-section="download">
-    <div class="container">
-      <div style="text-align: center; max-width: 40ch; margin: 0 auto 8px;">
-        <p class="eyebrow">DOWNLOAD · 多平台支持</p>
-        <h2>选择你的平台</h2>
-        <p class="lead" style="margin: 12px auto 0;">支持 Windows、Linux、鸿蒙、安卓四大平台<br/>Windows 和 Linux 提供安装包下载 + 命令行一键安装两种方式</p>
-      </div>
-
-      <!-- Platform selector -->
-      <div class="platform-grid" id="platformGrid">
-        <!-- Windows -->
-        <div class="platform-card active" data-platform="windows" onclick="selectPlatform('windows')">
-          <div class="platform-icon">🪟</div>
-          <div class="platform-name">Windows</div>
-          <div class="platform-desc">安装包 + 命令行安装</div>
-        </div>
-        <!-- Linux -->
-        <div class="platform-card" data-platform="linux" onclick="selectPlatform('linux')">
-          <div class="platform-icon">🐧</div>
-          <div class="platform-name">Linux</div>
-          <div class="platform-desc">多发行版命令行安装</div>
-        </div>
-        <!-- HarmonyOS -->
-        <div class="platform-card" data-platform="harmony" onclick="selectPlatform('harmony')">
-          <div class="platform-icon">🔴</div>
-          <div class="platform-name">鸿蒙</div>
-          <div class="platform-desc">即将推出</div>
-        </div>
-        <!-- Android -->
-        <div class="platform-card" data-platform="android" onclick="selectPlatform('android')">
-          <div class="platform-icon">🤖</div>
-          <div class="platform-name">安卓</div>
-          <div class="platform-desc">APK 直接安装</div>
+    <!-- ═══════════ PAGE: HOME ═══════════ -->
+    <section class="page active" id="page-home" data-page="home">
+      <div class="hero">
+        <div class="container hero-center">
+          <div class="game-icon" aria-hidden="true">🌍</div>
+          <h1>现实模拟 <span class="grad">RealitySim</span></h1>
+          <p class="lead">一个 1:1 还原现实的沙盒人生模拟游戏。从呱呱坠地到百年之后，每一个选择都改变你的人生轨迹。</p>
+          <div class="hero-cta">
+            <button class="btn btn-primary btn-lg" data-nav="download">⬇ 免费下载</button>
+            <button class="btn btn-secondary btn-lg" data-nav="game">了解详情 →</button>
+          </div>
+          <div class="tags" aria-label="游戏标签">
+            <span class="tag tag-accent">✓ 官方正版</span>
+            <span class="tag tag-accent">正式版 v1.1.0</span>
+            <span class="tag">🎮 3D 开放世界</span>
+            <span class="tag">🌐 四平台支持</span>
+            <span class="tag">🧩 沙盒人生模拟</span>
+          </div>
+          <div class="stat-strip" id="homeStats" aria-label="社区数据概览"></div>
+          <div class="announce-strip" role="region" aria-label="最新公告">
+            <span class="ann-icon" aria-hidden="true">📢</span>
+            <span class="ann-text"><strong>最新公告：</strong><span id="homeAnnounce">加载中…</span></span>
+          </div>
         </div>
       </div>
+    </section>
 
-      <!-- Download actions -->
-      <div class="download-actions" id="downloadActions">
-        <!-- Main download button -->
-        <button class="btn btn-primary btn-lg" id="mainDownloadBtn" onclick="handleMainDownload()">
-          <span id="mainDownloadIcon">⬇</span>
-          <span id="mainDownloadText">下载 Windows 安装包</span>
-        </button>
+    <!-- ═══════════ PAGE: GAME ═══════════ -->
+    <section class="page" id="page-game" data-page="game">
+      <div class="section">
+        <div class="container stack" style="gap: var(--gap-xl);">
 
-        <!-- Secondary action: command line install (Win/Linux only) -->
-        <div class="action-row" id="secondaryActions">
-          <button class="btn btn-secondary" id="cliInstallBtn" onclick="toggleCommandPanel()">
-            <span>💻</span> 命令行安装
-          </button>
-        </div>
+          <!-- 世界观 -->
+          <div class="section-head">
+            <p class="eyebrow">WORLD · 世界观</p>
+            <h2>在"现实模拟"里，活出第二段人生</h2>
+          </div>
+          <div class="lore-block">
+            <div class="lore-quote">「如果人生可以重来一次，你会怎么活？」</div>
+            <p>《现实模拟》是一款以<b style="color:var(--fg)">「自由度」为唯一 KPI</b> 的沙盒人生模拟游戏。你将从 0 岁呱呱坠地开始，经历婴儿期的牙牙学语、学生时代的课业与叛逆、职场中的摸爬滚打，再到组建家庭、养育后代，直至走完一生。整个世界的运作逻辑 1:1 还原现实——<b style="color:var(--fg)">没有强制主线，没有任务清单，只有无限可能。</b></p>
+            <p>游戏内建独立的虚拟历法时间系统，春夏秋冬、日夜轮转都按游戏时间自然流动。你可以选择安稳读书、按部就班地工作；也可以辍学创业、环游世界；甚至可以一路读研深造、投身航天，把火箭送上太空。世界上每一座城市、每一条街道、每一个 NPC 都有各自的生活轨迹，他们吃饭、上班、恋爱、争吵、老去，与你产生真实的情感连接。</p>
+            <p>更特别的是，游戏中不存在任何现实品牌与商标——所有餐厅、商店、手机、社交软件均为原创平替，所有国家与地标均以虚构方式呈现。在完全合规的框架下，给你最纯粹、最自由的模拟人生体验。</p>
+          </div>
 
-        <!-- Command panel (hidden by default) -->
-        <div class="command-panel" id="commandPanel">
-          <div class="command-header">
-            <div class="command-dots">
-              <span class="command-dot red"></span>
-              <span class="command-dot yellow"></span>
-              <span class="command-dot green"></span>
+          <!-- 玩法特色 -->
+          <div class="section-head" style="margin-top: var(--gap-xl);">
+            <p class="eyebrow">GAMEPLAY · 玩法特色</p>
+            <h2>为什么选择现实模拟？</h2>
+          </div>
+          <div class="feature-grid grid-2" id="featureList"></div>
+
+          <!-- 截图占位 -->
+          <div class="section-head" style="margin-top: var(--gap-xl);">
+            <p class="eyebrow">SCREENSHOTS · 游戏截图</p>
+            <h2>先睹为快</h2>
+          </div>
+          <div class="screenshot-grid" id="screenshotGrid"></div>
+
+          <!-- 版本与更新日志 -->
+          <div class="section-head" style="margin-top: var(--gap-xl);">
+            <p class="eyebrow">CHANGELOG · 版本信息与更新日志</p>
+            <h2>版本动态</h2>
+          </div>
+          <div class="grid-2" style="align-items:start;">
+            <div class="panel">
+              <div class="panel-title">📦 当前版本信息</div>
+              <div class="req-row"><span class="req-label">最新版本</span><span class="req-value" style="color:var(--accent)">v1.1.0</span></div>
+              <div class="req-row"><span class="req-label">发行状态</span><span class="req-value" style="color:var(--accent)">正式版</span></div>
+              <div class="req-row"><span class="req-label">PC 包大小</span><span class="req-value">约 2.4 GB</span></div>
+              <div class="req-row"><span class="req-label">移动端</span><span class="req-value">安卓 APK / 鸿蒙 HAP</span></div>
+              <div class="req-row"><span class="req-label">更新日期</span><span class="req-value">2026-08-15</span></div>
+              <div class="req-row"><span class="req-label">开发引擎</span><span class="req-value">团结引擎 (URP)</span></div>
             </div>
-            <span id="commandPanelTitle">Terminal — Windows PowerShell</span>
+            <div class="changelog" id="changelogList" role="list" aria-label="更新日志"></div>
           </div>
-          <div class="command-body" id="commandBody">
-            <!-- Dynamic content -->
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ PAGE: DOWNLOAD ═══════════ -->
+    <section class="page" id="page-download" data-page="download">
+      <div class="section download-section" id="download">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">DOWNLOAD · 多平台支持</p>
+            <h2>选择你的平台</h2>
+            <p class="lead">支持 Windows、Linux、安卓、鸿蒙四大平台，Windows 与 Linux 提供安装包 + 命令行两种安装方式。</p>
           </div>
-          <div style="text-align:center; padding-bottom: 16px;">
-            <button class="copy-btn" id="copyBtn" onclick="copyCommand()">
-              📋 复制命令
+
+          <div class="platform-grid" id="platformGrid" role="tablist" aria-label="平台选择"></div>
+
+          <div class="download-actions">
+            <button class="btn btn-primary btn-lg" id="mainDownloadBtn">
+              <span id="mainDownloadIcon" aria-hidden="true">⬇</span>
+              <span id="mainDownloadText">下载 Windows 安装包</span>
             </button>
+            <div class="action-row" id="secondaryActions">
+              <button class="btn btn-secondary" id="cliInstallBtn">💻 命令行安装</button>
+            </div>
+            <div class="command-panel" id="commandPanel">
+              <div class="command-header">
+                <div class="command-dots" aria-hidden="true">
+                  <span class="command-dot red"></span>
+                  <span class="command-dot yellow"></span>
+                  <span class="command-dot green"></span>
+                </div>
+                <span id="commandPanelTitle">Terminal — Windows PowerShell</span>
+              </div>
+              <div class="command-body" id="commandBody"></div>
+              <div style="text-align:center; padding-bottom: 16px;">
+                <button class="copy-btn" id="copyBtn">📋 复制命令</button>
+              </div>
+              <p style="text-align:center; font-size:12px; color:var(--muted); padding: 0 16px 16px; margin:0;" id="commandHint"></p>
+            </div>
           </div>
-          <p style="text-align:center; font-size:12px; color:var(--muted); padding: 0 16px 16px; margin:0;" id="commandHint"></p>
+
+          <div class="version-bar">
+            <div class="version-item"><span aria-hidden="true">📦</span> 最新版本：<strong>v1.1.0</strong></div>
+            <div class="version-item"><span aria-hidden="true">🏷️</span> 发行状态：<strong style="color:var(--accent)">正式版</strong></div>
+            <div class="version-item"><span aria-hidden="true">💾</span> PC 包大小：<strong>约 2.4 GB</strong></div>
+            <div class="version-item"><span aria-hidden="true">📱</span> 移动端：<strong>安卓 / 鸿蒙</strong></div>
+          </div>
         </div>
       </div>
 
-      <!-- Version info bar -->
-      <div class="version-bar">
-        <div class="version-item"><span>📦</span> 最新版本：<strong>v1.0.0</strong></div>
-        <div class="version-item"><span>🏷️</span> 发行状态：<strong style="color:var(--accent)">正式版</strong></div>
-        <div class="version-item"><span>💾</span> PC 包大小：<strong>约 2.4 GB</strong></div>
-        <div class="version-item"><span>📱</span> 移动端支持：<strong>安卓 / 鸿蒙(即将)</strong></div>
+      <div class="section" id="requirements">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">SYSTEM REQUIREMENTS · 系统要求</p>
+            <h2>配置需求</h2>
+          </div>
+          <div class="req-grid" id="reqGrid"></div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ═══════════ FEATURES ═══════════ -->
-  <section class="section" id="features" data-section="features">
-    <div class="container stack" style="gap: 48px;">
-      <div style="text-align: center; max-width: 38ch; margin: 0 auto;">
-        <p class="eyebrow">GAME FEATURES · 核心特性</p>
-        <h2>为什么选择现实模拟？</h2>
+    <!-- ═══════════ PAGE: COMMUNITY ═══════════ -->
+    <section class="page" id="page-community" data-page="community">
+      <div class="section">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">COMMUNITY · 玩家社区</p>
+            <h2>与千万玩家一起分享人生</h2>
+          </div>
+          <div class="community-layout">
+            <div>
+              <div class="panel" style="margin-bottom: var(--gap-lg);">
+                <div class="panel-title">✍️ 发布帖子</div>
+                <form id="postForm">
+                  <div class="field">
+                    <label for="postTitle">标题</label>
+                    <input type="text" id="postTitle" maxlength="60" placeholder="一句话说清你想分享的事" required />
+                  </div>
+                  <div class="field">
+                    <label for="postContent">内容</label>
+                    <textarea id="postContent" maxlength="2000" placeholder="分享你的人生故事、攻略心得、或遇到的趣事…" required></textarea>
+                  </div>
+                  <div class="row-between">
+                    <span class="meta" id="postAsLabel">发布为：玩家</span>
+                    <button type="submit" class="btn btn-primary btn-sm">发布帖子</button>
+                  </div>
+                </form>
+              </div>
+              <div class="row-between" style="margin-bottom: var(--gap-md);">
+                <h3 style="font-size:16px;">最新帖子</h3>
+                <span class="meta" id="postCount"></span>
+              </div>
+              <div id="postList" aria-live="polite"></div>
+            </div>
+            <aside class="panel" aria-label="公告栏">
+              <div class="panel-title">📢 官方公告</div>
+              <div id="announceList"></div>
+            </aside>
+          </div>
+        </div>
       </div>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-icon">🎨</div>
-          <h3>3D 现实引擎</h3>
-          <p>采用 Unity 中国版（团结引擎）打造，基于物理的渲染（PBR）技术，真实还原光影、材质与天气系统。每一帧画面都经过精心调校，呈现电影级视觉体验。</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🗺️</div>
-          <h3>无缝开放世界</h3>
-          <p>从繁华都市到宁静乡村，从高山深海到沙漠极地——一个完全无缝连接的开放世界等待探索。没有加载画面，只有无尽的冒险可能。</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">⚙️</div>
-          <h3>真实物理系统</h3>
-          <p>完整的刚体流体动力学模拟，真实的碰撞反馈、重力效果与环境交互。每一颗石子滚落的方向，每一滴雨水的轨迹，都遵循物理法则。</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🌅</div>
-          <h3>昼夜与四季</h3>
-          <p>动态时间流逝系统，实时模拟日出日落、季节更替与气候变化。春花秋月、夏雨冬雪，每个时刻都有独特的氛围与玩法变化。</p>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ═══════════ SYSTEM REQUIREMENTS ═══════════ -->
-  <section class="section" id="requirements" data-section="requirements">
-    <div class="container">
-      <div style="text-align: center; max-width: 38ch; margin: 0 auto 48px;">
-        <p class="eyebrow">SYSTEM REQUIREMENTS · 系统要求</p>
-        <h2>配置需求</h2>
-      </div>
-      <div class="req-grid">
-        <!-- Windows -->
-        <div class="req-card">
-          <div class="req-card-header">
-            <div class="req-platform-icon">🪟</div>
-            <div class="req-platform-name">Windows<span>64 位系统</span></div>
+    <!-- ═══════════ PAGE: PLAYERS ═══════════ -->
+    <section class="page" id="page-players" data-page="players">
+      <div class="section">
+        <div class="container">
+          <div class="section-head">
+            <p class="eyebrow">PLAYERS · 玩家广场</p>
+            <h2>遇见同频的灵魂</h2>
           </div>
-          <div class="req-row"><span class="req-label">系统版本</span><span class="req-value">Windows 10 / 11 (64-bit)</span></div>
-          <div class="req-row"><span class="req-label">安装方式</span><span class="req-value">ZIP 解压 / PowerShell 一键脚本</span></div>
-          <div class="req-row"><span class="req-label">处理器</span><span class="req-value">Intel i5-8400 / AMD Ryzen 5 2600 或更高</span></div>
-          <div class="req-row"><span class="req-label">内存</span><span class="req-value">8 GB RAM（推荐 16 GB）</span></div>
-          <div class="req-row"><span class="req-label">存储空间</span><span class="req-value">6 GB 可用空间（SSD 推荐）</span></div>
-          <div class="req-row"><span class="req-label">显卡</span><span class="req-value">GTX 1060 / RX 580 或更高（4GB 显存）</span></div>
-        </div>
-        <!-- Linux -->
-        <div class="req-card">
-          <div class="req-card-header">
-            <div class="req-platform-icon">🐧</div>
-            <div class="req-platform-name">Linux<span>多发行版支持</span></div>
-          </div>
-          <div class="req-row"><span class="req-label">发行版</span><span class="req-value">Ubuntu / Debian / Fedora / Arch / openSUSE</span></div>
-          <div class="req-row"><span class="req-label">安装方式</span><span class="req-value">tar.gz 解压 / Bash 一键脚本</span></div>
-          <div class="req-row"><span class="req-label">处理器</span><span class="req-value">x86_64, Intel i5 同等或更高</span></div>
-          <div class="req-row"><span class="req-label">内存</span><span class="req-value">8 GB RAM（推荐 16 GB）</span></div>
-          <div class="req-row"><span class="req-label">存储空间</span><span class="req-value">6 GB 可用空间</span></div>
-          <div class="req-row"><span class="req-label">显卡驱动</span><span class="req-value">Mesa 21.0+ / NVIDIA 470+ / AMDVLK</span></div>
-        </div>
-        <!-- HarmonyOS -->
-        <div class="req-card">
-          <div class="req-card-header">
-            <div class="req-platform-icon">🔴</div>
-            <div class="req-platform-name">鸿蒙 HarmonyOS<span>即将推出</span></div>
-          </div>
-          <div class="req-row"><span class="req-label">系统版本</span><span class="req-value">HarmonyOS NEXT 5.0+</span></div>
-          <div class="req-row"><span class="req-label">安装方式</span><span class="req-value">HAP 应用包（应用市场）</span></div>
-          <div class="req-row"><span class="req-label">处理器</span><span class="req-value">Kirin 9000 系列或同等性能</span></div>
-          <div class="req-row"><span class="req-label">内存</span><span class="req-value">8 GB RAM</span></div>
-          <div class="req-row"><span class="req-label">存储空间</span><span class="req-value">6 GB 可用空间</span></div>
-          <div class="req-row"><span class="req-label">状态</span><span class="req-value" style="color:var(--warning)">🚧 构建中，敬请期待</span></div>
-        </div>
-        <!-- Android -->
-        <div class="req-card">
-          <div class="req-card-header">
-            <div class="req-platform-icon">🤖</div>
-            <div class="req-platform-name">Android<span>移动端</span></div>
-          </div>
-          <div class="req-row"><span class="req-label">系统版本</span><span class="req-value">Android 8.0 (API 26) 或更高</span></div>
-          <div class="req-row"><span class="req-label">安装方式</span><span class="req-value">APK 直接安装</span></div>
-          <div class="req-row"><span class="req-label">处理器</span><span class="req-value">骁龙 855 / 天玑 800 或更高</span></div>
-          <div class="req-row"><span class="req-label">内存</span><span class="req-value">4 GB RAM（推荐 6 GB）</span></div>
-          <div class="req-row"><span class="req-label">存储空间</span><span class="req-value">4 GB 可用空间</span></div>
-          <div class="req-row"><span class="req-label">GPU</span><span class="req-value">Adreno 640 / Mali-G77 或同等</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ═══════════ CTA ═══════════ -->
-  <section class="section cta-section" data-section="cta">
-    <div class="container">
-      <h2>准备好进入现实了吗？</h2>
-      <p class="lead">免费下载，即刻开始你的现实模拟之旅。<br/>一个完全属于你的开放世界在等待。</p>
-      <button class="btn btn-primary btn-lg" onclick="document.getElementById('download').scrollIntoView({behavior:'smooth'})">⬇ 立即下载</button>
-    </div>
-  </section>
+          <div class="player-profile" id="myProfile"></div>
+
+          <div style="height: var(--gap-xl);" aria-hidden="true"></div>
+
+          <div class="row-between" style="margin-bottom: var(--gap-md);">
+            <h3 style="font-size:18px;">玩家列表</h3>
+            <span class="meta" id="playerCount"></span>
+          </div>
+          <div class="search-bar" role="search" aria-label="搜索玩家">
+            <input type="search" id="playerSearch" placeholder="按昵称或签名搜索玩家…" aria-label="搜索玩家" />
+            <button class="btn btn-secondary" id="playerSearchClear">清空</button>
+          </div>
+          <div id="playerList" aria-live="polite"></div>
+
+          <div style="height: var(--gap-lg);" aria-hidden="true"></div>
+          <div class="panel">
+            <div class="panel-title">✉️ 我的私信</div>
+            <div id="messageList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ CTA ═══════════ -->
+    <section class="page" id="page-cta" data-page="cta">
+      <div class="section cta-section">
+        <div class="container">
+          <h2>准备好进入现实了吗？</h2>
+          <p class="lead">免费下载，即刻开始你的第二段人生。</p>
+          <button class="btn btn-primary btn-lg" data-nav="download">⬇ 立即下载</button>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ═══════════ FOOTER ═══════════ -->
-  <footer class="pagefoot" data-section="footer">
+  <footer class="pagefoot">
     <div class="container row-between">
-      <span>© 2026 现实模拟 (RealitySim) · 基于 Unity 中国版（团结引擎）开发</span>
+      <span>© 2026 现实模拟 (RealitySim) · 基于团结引擎开发</span>
       <span class="meta">
-        <a href="#" style="color:inherit;">关于我们</a> · 
-        <a href="#" style="color:inherit;">加入测试</a> · 
-        <a href="#" style="color:inherit;">联系我们</a> · 
-        由 <a href="https://tabbit-ai.com" target="_blank" rel="noopener" style="color:var(--accent);">Tabbit</a> 制作
+        <button class="btn-ghost" data-nav="game">关于我们</button>
+        <button class="btn-ghost" data-nav="community">加入社区</button>
+        <button class="btn-ghost" data-nav="players">玩家广场</button>
       </span>
     </div>
   </footer>
 
-  <!-- ═══════════ JAVASCRIPT ═══════════ -->
+  <!-- ═══════════ MODALS ═══════════ -->
+  <div class="modal-overlay" id="postModalOverlay" role="dialog" aria-modal="true" aria-label="帖子详情">
+    <div class="modal modal-lg" id="postModal"></div>
+  </div>
+  <div class="modal-overlay" id="msgModalOverlay" role="dialog" aria-modal="true" aria-label="私信">
+    <div class="modal" id="msgModal"></div>
+  </div>
+  <div class="modal-overlay" id="profileModalOverlay" role="dialog" aria-modal="true" aria-label="编辑我的资料">
+    <div class="modal" id="profileModal"></div>
+  </div>
+
+  <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
   <script>
-    // ─── Platform data ───────────────────────────────────────────────
-    const PLATFORM_DATA = {
-      windows: {
-        name: 'Windows',
-        icon: '🪟',
-        downloadUrl: 'https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Windows.zip',
-        downloadText: '下载 Windows 安装包',
-        hasCli: true,
-        cliTitle: 'Terminal — Windows PowerShell',
-        cliCommand: '<span class="cmd-comment"># 在 PowerShell 中执行以下命令下载安装包：</span>\n\n<span class="cmd-keyword">Invoke-WebRequest</span> <span class="cmd-flag">-Uri</span> <span class="cmd-string">"https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Windows.zip"</span> <span class="cmd-flag">-OutFile</span> <span class="cmd-string">RealitySim_Windows.zip</span>\n<span class="cmd-comment"># 解压后运行 RealitySim.exe</span>',
-        copyText: 'Invoke-WebRequest -Uri "https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Windows.zip" -OutFile RealitySim_Windows.zip',
-        hint: '💡 在 PowerShell 中执行此命令下载安装包，解压后运行 RealitySim.exe 即可。'
-      },
-      linux: {
-        name: 'Linux',
-        icon: '🐧',
-        downloadUrl: 'https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Linux.tar.gz',
-        downloadText: '下载 Linux 安装包 (tar.gz)',
-        hasCli: true,
-        cliTitle: 'Terminal — Bash',
-        cliCommand: '<span class="cmd-comment"># 在终端中执行以下命令下载并解压：</span>\n\n<span class="cmd-keyword">wget</span> <span class="cmd-string">https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Linux.tar.gz</span>\n<span class="cmd-keyword">tar</span> <span class="cmd-flag">-xzf</span> <span class="cmd-string">RealitySim_Linux.tar.gz</span>',
-        copyText: 'wget https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Linux.tar.gz && tar -xzf RealitySim_Linux.tar.gz',
-        hint: '💡 支持 Ubuntu / Debian / Fedora / Arch / openSUSE 等主流发行版。下载解压后运行 RealitySim.x86_64。'
-      },
-      harmony: {
-        name: '鸿蒙',
-        icon: '🔴',
-        downloadUrl: 'https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim.hap',
-        downloadText: '下载鸿蒙安装包 (HAP)',
-        hasCli: false,
-        cliTitle: '',
-        cliCommand: '',
-        copyText: '',
-        hint: ''
-      },
-      android: {
-        name: '安卓',
-        icon: '🤖',
-        downloadUrl: 'https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim.apk',
-        downloadText: '下载安卓 APK 安装包',
-        hasCli: false,
-        cliTitle: '',
-        cliCommand: '',
-        copyText: '',
-        hint: ''
-      }
-    };
+'use strict';
 
-    let currentPlatform = 'windows';
+/* ════════════════════════════════════════════════════════════════
+   1. 静态数据（下载 / 介绍 / 系统要求 / 更新日志 / 公告）
+════════════════════════════════════════════════════════════════ */
+const PLATFORMS = [
+  {
+    id: 'windows', name: 'Windows', icon: '🪟', desc: 'Win10 / Win11 x64',
+    url: 'https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Windows.zip',
+    file: 'RealitySim_Windows.zip', size: '约 2.4 GB',
+    command: 'winget install --id 231ljk.RealitySim --source "https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Windows.zip"',
+    commandTitle: 'Terminal — Windows PowerShell',
+    hint: 'winget 命令安装；或直接下载安装包双击运行。'
+  },
+  {
+    id: 'linux', name: 'Linux', icon: '🐧', desc: 'Ubuntu 20.04+ x64',
+    url: 'https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Linux.tar.gz',
+    file: 'RealitySim_Linux.tar.gz', size: '约 2.3 GB',
+    command: 'curl -L -o RealitySim_Linux.tar.gz "https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim_Linux.tar.gz"\ntar -xzf RealitySim_Linux.tar.gz\ncd RealitySim && ./RealitySim.x86_64',
+    commandTitle: 'Terminal — Linux Bash',
+    hint: '下载后解压，运行 RealitySim.x86_64 即可（需 libstdc++6 与 图形驱动）。'
+  },
+  {
+    id: 'android', name: '安卓', icon: '🤖', desc: 'Android 9.0+',
+    url: 'https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim.apk',
+    file: 'RealitySim.apk', size: '约 980 MB',
+    command: 'adb install "https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim.apk"',
+    commandTitle: 'Terminal — adb 安装',
+    hint: '也可直接下载 APK 到手机点击安装（需允许未知来源）。'
+  },
+  {
+    id: 'harmony', name: '鸿蒙', icon: '📱', desc: 'HarmonyOS NEXT',
+    url: 'https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim.hap',
+    file: 'RealitySim.hap', size: '约 1.1 GB',
+    command: 'hdc install "https://github.com/231ljk/realitysim-test/releases/download/v1.0.0/RealitySim.hap"',
+    commandTitle: 'Terminal — hdc 安装',
+    hint: '下载 HAP 后通过手机文件管理打开安装，或在 DevEco Studio 中使用 hdc 命令安装。'
+  }
+];
 
-    // ─── Platform selection ─────────────────────────────────────────
-    function selectPlatform(platform) {
-      currentPlatform = platform;
-      const data = PLATFORM_DATA[platform];
+const FEATURES = [
+  { icon: '🕰️', title: '完整人生流程', text: '出生、成长、求学、工作、婚恋、育儿到传承，一生一世的沉浸体验，死亡后人生存档可追溯。' },
+  { icon: '🏙️', title: '1:1 还原世界', text: '街道、商场、学校、医院、交通、天气系统完整模拟，城市细节丰富到可以靠送外卖认路。' },
+  { icon: '🧑‍🤝‍🧑', title: '百行百业 NPC', text: '每一个 NPC 都有自己的作息、职业、性格与人生目标，世界在你不玩时依然在运转。' },
+  { icon: '🎯', title: '自由度至上', text: '没有强制主线，没有任务清单。辍学创业、流浪远方、读博深造，任何选择都会被世界回应。' },
+  { icon: '⚖️', title: '独立时间系统', text: '游戏专属虚拟历法与节日，与现实日期完全隔离，春夏秋冬、节日庆典按游戏时间自然流转。' },
+  { icon: '📱', title: '虚拟手机生态', text: '游戏内手机内置外卖、购物、社交、求职等 App，还原现代生活的每一块屏幕。' },
+  { icon: '🚀', title: '硬核职业系统', text: '从收银员到航天员，数十种职业执照考试上岗，职业表现直接影响工资与晋升。' },
+  { icon: '🌌', title: '科幻拓展', text: '科技树解锁太空探索与神秘事件（科幻悬疑风格），深空、月球基地、外星生态任你开拓。' },
+  { icon: '💬', title: '社区与交友', text: '内置玩家社区，分享人生故事、找同好组队，让模拟人生不再孤单。' },
+  { icon: '🛡️', title: '未成年人保护', text: '实名认证 + 防沉迷体系，内容健康正向，虚拟经济与现实货币完全隔离。' }
+];
 
-      // Update card states
-      document.querySelectorAll('.platform-card').forEach(card => {
-        card.classList.toggle('active', card.dataset.platform === platform);
-      });
+const SCREENSHOTS = [
+  { emoji: '🏙️', label: '城市街道 · 清晨的阳光洒在写字楼间' },
+  { emoji: '🏫', label: '校园生活 · 图书馆里备战期末' },
+  { emoji: '💼', label: '职场日常 · 会议室里的头脑风暴' },
+  { emoji: '🌹', label: '恋爱约会 · 海边摩天轮下的告白' },
+  { emoji: '🛒', label: '商场购物 · 周末的买买买时光' },
+  { emoji: '🚀', label: '太空探索 · 在月球基地种下第一棵菜' }
+];
 
-      // Update main download button
-      const mainBtn = document.getElementById('mainDownloadBtn');
-      const mainIcon = document.getElementById('mainDownloadIcon');
-      const mainText = document.getElementById('mainDownloadText');
+const CHANGELOG = [
+  {
+    ver: 'v1.1.0', date: '2026-08-15', title: '下载站升级 · 社区开放',
+    body: ['新增官方玩家社区（帖子 / 评论 / 点赞）', '新增玩家广场（资料卡 / 搜索 / 关注 / 私信）', '优化安装引导与命令行安装说明']
+  },
+  {
+    ver: 'v1.0.0', date: '2026-07-01', title: '正式版首发',
+    body: ['完整人生流程：出生至百岁', '百行百业职业系统与执照考试', '四平台同步发行：Windows / Linux / 安卓 / 鸿蒙', '实名认证与防沉迷上线']
+  },
+  {
+    ver: 'v0.9.0', date: '2026-05-20', title: '联机内测',
+    body: ['好友联机同住宿舍', '离线好友 AI 托管', '云存档打通跨端进度']
+  },
+  {
+    ver: 'v0.5.0', date: '2026-03-02', title: '首个原型',
+    body: ['第三人称自由移动', '基础世界与 NPC 作息', '独立虚拟历法系统']
+  }
+];
 
-      mainBtn.disabled = false;
-      mainBtn.style.opacity = '1';
-      mainBtn.style.cursor = 'pointer';
-      mainIcon.textContent = '⬇';
-      mainText.textContent = data.downloadText;
+const ANNOUNCEMENTS = [
+  { id: 1, tag: '置顶', title: 'v1.1.0 版本更新公告', text: '下载站升级：新增社区与玩家广场功能，欢迎体验！', date: '2026-08-15' },
+  { id: 2, tag: '活动', title: '新玩家入驻礼', text: '注册玩家广场账号并完善资料，可获得游戏内虚拟金币 5000。', date: '2026-08-10' },
+  { id: 3, tag: '维护', title: '每周维护说明', text: '每周三凌晨 4:00-6:00 例行维护，联机功能将短暂不可用。', date: '2026-08-08' }
+];
 
-      // Show/hide CLI button
-      const cliBtn = document.getElementById('cliInstallBtn');
-      const secondaryActions = document.getElementById('secondaryActions');
-      if (data.hasCli) {
-        secondaryActions.style.display = 'flex';
-      } else {
-        secondaryActions.style.display = 'none';
-      }
+const REQUIREMENTS = [
+  {
+    icon: '🪟', name: 'Windows', desc: 'Windows 10 19041+ / 11 x64',
+    rows: [
+      ['操作系统', 'Win10 64位 (19041+) / Win11'],
+      ['处理器', 'Intel i5-9400F / AMD R5 3600 及以上'],
+      ['内存', '8 GB'],
+      ['显卡', 'GTX 1050 4GB / RX 560 及以上'],
+      ['存储空间', '6 GB 可用空间']
+    ]
+  },
+  {
+    icon: '🐧', name: 'Linux', desc: 'Ubuntu 20.04+ x64',
+    rows: [
+      ['操作系统', 'Ubuntu 20.04+ / Debian 11+ 64位'],
+      ['处理器', 'Intel i5-9400F / AMD R5 3600 及以上'],
+      ['内存', '8 GB'],
+      ['显卡', 'GTX 1050 4GB（需最新开源/闭源驱动）'],
+      ['存储空间', '6 GB 可用空间']
+    ]
+  },
+  {
+    icon: '🤖', name: '安卓', desc: 'Android 9.0+',
+    rows: [
+      ['系统版本', 'Android 9.0 及以上'],
+      ['处理器', '骁龙 730G / 麒麟 810 及以上'],
+      ['内存', '6 GB'],
+      ['存储空间', '6 GB 可用空间'],
+      ['备注', '建议预留 8 GB 以获得更佳体验']
+    ]
+  },
+  {
+    icon: '📱', name: '鸿蒙', desc: 'HarmonyOS NEXT',
+    rows: [
+      ['系统版本', 'HarmonyOS NEXT 及以上'],
+      ['处理器', '麒麟 810 / 骁龙 730G 及以上'],
+      ['内存', '6 GB'],
+      ['存储空间', '6 GB 可用空间'],
+      ['备注', '需开启「允许安装未知来源应用」']
+    ]
+  }
+];
 
-      // Hide command panel when switching platform
-      document.getElementById('commandPanel').classList.remove('visible');
+/* ════════════════════════════════════════════════════════════════
+   2. 数据层（localStorage 模拟后端）
+════════════════════════════════════════════════════════════════ */
+const Store = {
+  KEY: {
+    profile: 'rs_profile',
+    players: 'rs_players',
+    follows: 'rs_follows',
+    posts: 'rs_posts',
+    messages: 'rs_messages',
+    comments: 'rs_comments',
+    likes: 'rs_likes'
+  },
+  load(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw === null ? fallback : JSON.parse(raw);
+    } catch (e) {
+      console.warn('[Store] 读取失败:', key, e);
+      return fallback;
     }
-
-    // ─── Main download handler ──────────────────────────────────────
-    function handleMainDownload() {
-      const data = PLATFORM_DATA[currentPlatform];
-      if (!data || data.downloadUrl === '#') {
-        alert('该平台版本正在构建中，敬请期待！');
-        return;
-      }
-      window.open(data.downloadUrl, '_blank');
+  },
+  save(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      console.warn('[Store] 写入失败:', key, e);
+      toast('数据保存失败：存储空间可能已满');
     }
+  },
+  uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+};
 
-    // ─── Command panel toggle ───────────────────────────────────────
-    function toggleCommandPanel() {
-      const panel = document.getElementById('commandPanel');
-      const data = PLATFORM_DATA[currentPlatform];
+/* 初始种子数据 */
+const SEED_PROFILE = { nick: '新手玩家', avatar: '🌍', signature: '人生没有标准答案，去探索吧。', playHours: 0 };
+const SEED_PLAYERS = [
+  { id: 'p01', nick: '星河漫步者', avatar: '🌌', signature: '仰望星空，也脚踏实地', playHours: 268 },
+  { id: 'p02', nick: '老张的猫', avatar: '🐱', signature: '喵，今天也是摸鱼的一天', playHours: 328 },
+  { id: 'p03', nick: '咖啡不加糖', avatar: '☕', signature: '凌晨四点的外卖骑手，见过城市所有角落', playHours: 155 },
+  { id: 'p04', nick: '火箭小子', avatar: '🚀', signature: '目标是星辰大海', playHours: 420 },
+  { id: 'p05', nick: '小镇做题家', avatar: '📚', signature: '刷题使我快乐（并不）', playHours: 96 },
+  { id: 'p06', nick: '咸鱼翻身', avatar: '🐟', signature: '今天也要努力翻身', playHours: 12 },
+  { id: 'p07', nick: '夜航星', avatar: '✨', signature: '愿所有热爱，都有回响', playHours: 210 },
+  { id: 'p08', nick: '阿福', avatar: '🐶', signature: '汪！一起玩吧！', playHours: 50 }
+];
+const SEED_POSTS = [
+  {
+    id: 'seed1', author: '星河漫步者', avatar: '🌌', time: 1784000000000,
+    title: '新人生第一天：我选择了辍学去流浪',
+    content: '出生在普通家庭，读完高中就偷偷办了退学手续。背上背包，用打工攒的钱买了一辆二手自行车，沿着海岸线一路向南。\n\n遇到雨天就在便利店打工，晴了就继续骑行。NPC 家长以为我在读书，直到三个月后才收到我寄回的明信片。\n\n这就是我想要的自由。',
+    comments: [
+      { id: 'c1', author: '咖啡不加糖', avatar: '☕', content: '太有勇气了！我也想过这种生活。', time: 1784005000000 },
+      { id: 'c2', author: '阿福', avatar: '🐶', content: '我第一世老老实实当程序员，第二世果断辞职开小卖部，真香。', time: 1784009000000 }
+    ]
+  },
+  {
+    id: 'seed2', author: '咖啡不加糖', avatar: '☕', time: 1783900000000,
+    title: '打工日记：凌晨四点的外卖骑手',
+    content: '今天接了 43 单，其中 12 单是深夜奶茶订单。遇到暴雨天气，平台自动加价 30%，我咬牙全接了。\n\n最感动的是一位 NPC 小姐姐看我淋透了，多给了 5 块虚拟币打赏。\n\n虽然累，但看着钱包里的数字一点点涨起来，很有成就感。',
+    comments: [
+      { id: 'c3', author: '老张的猫', avatar: '🐱', content: '外卖系统真的细节，我上次迟到被差评扣了钱，哭了。', time: 1783905000000 }
+    ]
+  },
+  {
+    id: 'seed3', author: '火箭小子', avatar: '🚀', time: 1783700000000,
+    title: '求攻略：怎么才能考到航天员执照？',
+    content: '我已经读完航天工程专业，现在卡在最后一关：需要 200 小时的模拟飞行时长 + 心理健康评估。\n\n有没有大佬分享一下考试技巧？主要是那个失重环境模拟太难了，每次都转晕。',
+    comments: [
+      { id: 'c4', author: '夜航星', avatar: '✨', content: '多去体育馆练旋转椅！亲测有效。', time: 1783705000000 },
+      { id: 'c5', author: '星河漫步者', avatar: '🌌', content: '建议先考普通飞行员执照，积累经验再去挑战航天执照。', time: 1783708000000 }
+    ]
+  },
+  {
+    id: 'seed4', author: '老张的猫', avatar: '🐱', time: 1783500000000,
+    title: '我在这游戏里结婚了！',
+    content: '游戏时间第 32 年，终于和追了三年的 NPC 修成正果。\n\n在海边摩天轮上求的婚，她哭着答应了。婚礼在游戏里的教堂举办，来了 40 多个 NPC 朋友。\n\n现在我们有了一对双胞胎，正在教他们走路。人生赢家，就是我！',
+    comments: [
+      { id: 'c6', author: '阿福', avatar: '🐶', content: '恭喜恭喜！我还在相亲局苦苦挣扎。', time: 1783505000000 }
+    ]
+  },
+  {
+    id: 'seed5', author: '夜航星', avatar: '✨', time: 1783200000000,
+    title: '社区公约：请友善发言',
+    content: '欢迎来到现实模拟社区！为了让大家有更好的交流体验，请遵守以下公约：\n\n1. 尊重他人，理性讨论，禁止人身攻击\n2. 内容健康，不涉及现实政治、宗教等敏感话题\n3. 禁止发布广告与垃圾信息\n4. 分享攻略时请注明版本\n\n祝大家在这里玩得开心！',
+    comments: []
+  }
+];
 
-      if (panel.classList.contains('visible')) {
-        panel.classList.remove('visible');
-        return;
-      }
-
-      // Update command content
-      document.getElementById('commandPanelTitle').textContent = data.cliTitle;
-      document.getElementById('commandBody').innerHTML = '<pre class="command-line">' + data.cliCommand + '</pre>';
-      document.getElementById('commandHint').textContent = data.hint;
-
-      // Reset copy button state
-      const copyBtn = document.getElementById('copyBtn');
-      copyBtn.classList.remove('copied');
-      copyBtn.textContent = '📋 复制命令';
-
-      panel.classList.add('visible');
+/* 数据访问 */
+const Data = {
+  getProfile() {
+    const p = Store.load(Store.KEY.profile, null);
+    if (!p) { Store.save(Store.KEY.profile, SEED_PROFILE); return { ...SEED_PROFILE }; }
+    return p;
+  },
+  saveProfile(p) { Store.save(Store.KEY.profile, p); },
+  getPlayers() {
+    const players = Store.load(Store.KEY.players, null);
+    if (!players) {
+      const self = this.getProfile();
+      const merged = [{ ...self, id: 'me' }, ...SEED_PLAYERS];
+      Store.save(Store.KEY.players, merged);
+      return merged;
     }
+    return players;
+  },
+  upsertPlayer(p) {
+    const players = this.getPlayers();
+    const idx = players.findIndex(x => x.id === p.id);
+    if (idx >= 0) players[idx] = { ...players[idx], ...p };
+    else players.push(p);
+    Store.save(Store.KEY.players, players);
+    return players;
+  },
+  getPosts() {
+    const posts = Store.load(Store.KEY.posts, null);
+    if (!posts) { Store.save(Store.KEY.posts, SEED_POSTS); return SEED_POSTS; }
+    return posts;
+  },
+  savePosts(posts) { Store.save(Store.KEY.posts, posts); },
+  getFollows() { return Store.load(Store.KEY.follows, []); },
+  saveFollows(list) { Store.save(Store.KEY.follows, list); },
+  getMessages() { return Store.load(Store.KEY.messages, []); },
+  saveMessages(list) { Store.save(Store.KEY.messages, list); }
+};
 
-    // ─── Copy command ───────────────────────────────────────────────
-    function copyCommand() {
-      const data = PLATFORM_DATA[currentPlatform];
-      const copyBtn = document.getElementById('copyBtn');
+/* ════════════════════════════════════════════════════════════════
+   3. 工具函数
+════════════════════════════════════════════════════════════════ */
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-      navigator.clipboard.writeText(data.copyText).then(() => {
-        copyBtn.classList.add('copied');
-        copyBtn.textContent = '✅ 已复制！';
-        setTimeout(() => {
-          copyBtn.classList.remove('copied');
-          copyBtn.textContent = '📋 复制命令';
-        }, 2000);
-      }).catch(() => {
-        // Fallback for older browsers
-        const textarea = document.createElement('textarea');
-        textarea.value = data.copyText;
-        textarea.style.position = 'fixed';
-        textarea.style.left = '-9999px';
-        document.body.appendChild(textarea);
-        textarea.select();
-        try {
-          document.execCommand('copy');
-          copyBtn.classList.add('copied');
-          copyBtn.textContent = '✅ 已复制！';
-          setTimeout(() => {
-            copyBtn.classList.remove('copied');
-            copyBtn.textContent = '📋 复制命令';
-          }, 2000);
-        } catch (e) {
-          copyBtn.textContent = '❌ 复制失败';
-        }
-        document.body.removeChild(textarea);
-      });
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function fmtTime(ts) {
+  const d = new Date(ts);
+  const now = Date.now();
+  const diff = Math.floor((now - ts) / 1000);
+  if (diff < 60) return '刚刚';
+  if (diff < 3600) return Math.floor(diff / 60) + ' 分钟前';
+  if (diff < 86400) return Math.floor(diff / 3600) + ' 小时前';
+  if (diff < 2592000) return Math.floor(diff / 86400) + ' 天前';
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function toast(msg) {
+  const wrap = $('#toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; }, 2200);
+  setTimeout(() => el.remove(), 2600);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   4. 渲染层（数据 → DOM）
+════════════════════════════════════════════════════════════════ */
+const Render = {
+  platforms() {
+    const grid = $('#platformGrid');
+    grid.innerHTML = PLATFORMS.map(p => `
+      <button class="platform-card${p.id === currentPlatform.id ? ' active' : ''}"
+              role="tab" aria-selected="${p.id === currentPlatform.id}"
+              data-platform="${p.id}" data-action="select-platform">
+        <span class="platform-icon" aria-hidden="true">${p.icon}</span>
+        <div class="platform-name">${p.name}</div>
+        <div class="platform-desc">${p.desc}</div>
+      </button>`).join('');
+  },
+  downloadPanel() {
+    const p = currentPlatform;
+    $('#mainDownloadIcon').textContent = p.icon;
+    $('#mainDownloadText').textContent = `下载 ${p.name} 安装包`;
+    $('#mainDownloadBtn').dataset.platformUrl = p.url;
+    $('#commandPanelTitle').textContent = p.commandTitle;
+    $('#commandBody').innerHTML = formatCommand(p.command);
+    $('#commandHint').textContent = p.hint;
+  },
+  features() {
+    $('#featureList').innerHTML = FEATURES.map(f => `
+      <article class="feature-card">
+        <div class="feature-icon" aria-hidden="true">${f.icon}</div>
+        <h3>${f.title}</h3>
+        <p>${f.text}</p>
+      </article>`).join('');
+  },
+  screenshots() {
+    $('#screenshotGrid').innerHTML = SCREENSHOTS.map(s => `
+      <figure class="shot" role="img" aria-label="${escapeHtml(s.label)}">
+        <div class="shot-emoji" aria-hidden="true">${s.emoji}</div>
+        <figcaption class="shot-label">${escapeHtml(s.label)}</figcaption>
+      </figure>`).join('');
+  },
+  changelog() {
+    $('#changelogList').innerHTML = CHANGELOG.map(c => `
+      <article class="cl-item">
+        <div><span class="cl-ver">${c.ver}</span><span class="cl-date">${c.date}</span></div>
+        <h4 class="cl-title">${c.title}</h4>
+        <div class="cl-body"><ul>${c.body.map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul></div>
+      </article>`).join('');
+  },
+  requirements() {
+    $('#reqGrid').innerHTML = REQUIREMENTS.map(r => `
+      <div class="req-card">
+        <div class="req-card-header">
+          <div class="req-platform-icon" aria-hidden="true">${r.icon}</div>
+          <div class="req-platform-name">${r.name}<span>${r.desc}</span></div>
+        </div>
+        ${r.rows.map(row => `
+          <div class="req-row"><span class="req-label">${row[0]}</span><span class="req-value">${row[1]}</span></div>`).join('')}
+      </div>`).join('');
+  },
+  homeStats() {
+    const posts = Data.getPosts();
+    const players = Data.getPlayers();
+    const follows = Data.getFollows();
+    const stats = [
+      ['💬', String(posts.length), '社区帖子'],
+      ['🧑‍🤝‍🧑', String(players.length), '注册玩家'],
+      ['⭐', String(follows.length), '我关注的'],
+      ['🕹️', 'v1.1.0', '当前版本']
+    ];
+    $('#homeStats').innerHTML = stats.map(s => `
+      <div class="stat-item">
+        <div class="stat-num"><span aria-hidden="true">${s[0]}</span> ${s[1]}</div>
+        <div class="stat-label">${s[2]}</div>
+      </div>`).join('');
+  },
+  announcements() {
+    $('#announceList').innerHTML = ANNOUNCEMENTS.map(a => `
+      <div class="ann-item">
+        <span class="badge badge-accent">${a.tag}</span>
+        <h4>${escapeHtml(a.title)}</h4>
+        <p>${escapeHtml(a.text)}</p>
+        <div class="meta">${a.date}</div>
+      </div>`).join('');
+    const top = ANNOUNCEMENTS[0];
+    $('#homeAnnounce').textContent = top ? `${top.title} — ${top.text}` : '';
+  },
+  posts() {
+    const posts = Data.getPosts();
+    const follows = Data.getFollows();
+    const myProfile = Data.getProfile();
+    const sorted = [...posts].sort((a, b) => b.time - a.time);
+    $('#postCount').textContent = `共 ${posts.length} 篇`;
+    if (!posts.length) {
+      $('#postList').innerHTML = `<div class="empty-state"><div class="es-icon">🗒️</div>还没有帖子，来发第一帖吧！</div>`;
+      return;
     }
+    $('#postList').innerHTML = sorted.map(p => {
+      const commentCount = (p.comments || []).length;
+      const liked = (p.likes || []).includes(myProfile.nick);
+      const isMine = p.author === myProfile.nick;
+      return `
+      <article class="post-card" data-post-id="${p.id}">
+        <div class="post-head">
+          <span class="avatar" aria-hidden="true">${p.avatar || '🧑'}</span>
+          <div>
+            <div class="post-author">${escapeHtml(p.author)}</div>
+            <div class="post-time">${fmtTime(p.time)}</div>
+          </div>
+        </div>
+        <h3 class="post-title">${escapeHtml(p.title)}</h3>
+        <p class="post-excerpt">${escapeHtml(p.content.slice(0, 120))}${p.content.length > 120 ? '…' : ''}</p>
+        <div class="post-foot">
+          <button class="action-btn${liked ? ' liked' : ''}" data-action="like-post" data-post-id="${p.id}" aria-label="点赞">
+            <span aria-hidden="true">👍</span> <span data-role="like-count">${(p.likes || []).length}</span>
+          </button>
+          <button class="action-btn" data-action="open-post" data-post-id="${p.id}" aria-label="评论">
+            <span aria-hidden="true">💬</span> <span>${commentCount}</span>
+          </button>
+          <button class="action-btn" data-action="open-post" data-post-id="${p.id}">查看详情</button>
+          ${isMine ? `<button class="action-btn danger" data-action="delete-post" data-post-id="${p.id}" aria-label="删除帖子">🗑 删除</button>` : ''}
+        </div>
+      </article>`;
+    }).join('');
+  },
+  players() {
+    const players = Data.getPlayers();
+    const follows = Data.getFollows();
+    const myProfile = Data.getProfile();
+    const kw = $('#playerSearch').value.trim().toLowerCase();
+    const filtered = players.filter(p => !kw || p.nick.toLowerCase().includes(kw) || (p.signature || '').toLowerCase().includes(kw));
+    const sorted = [...filtered].sort((a, b) => b.playHours - a.playHours);
+    $('#playerCount').textContent = `共 ${players.length} 位玩家`;
+    if (!sorted.length) {
+      $('#playerList').innerHTML = `<div class="empty-state"><div class="es-icon">🔍</div>没有找到匹配的玩家</div>`;
+      return;
+    }
+    $('#playerList').innerHTML = sorted.map(p => {
+      const isMe = p.id === 'me';
+      const followed = follows.includes(p.id);
+      return `
+      <div class="player-card">
+        <span class="avatar" aria-hidden="true">${p.avatar || '🧑'}</span>
+        <div class="pc-info">
+          <div class="pc-name">${escapeHtml(p.nick)}${isMe ? ' <span class="badge badge-accent">我</span>' : ''}</div>
+          <div class="pc-sign">${escapeHtml(p.signature || '这个人很懒，什么都没写')}</div>
+          <div class="pc-hours">🕹️ ${p.playHours} 小时</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; flex:none;">
+          ${isMe ? `<button class="btn btn-ghost btn-sm" data-action="edit-profile">编辑资料</button>`
+                 : `<button class="btn btn-sm ${followed ? 'btn-secondary' : 'btn-primary'}" data-action="toggle-follow" data-player-id="${p.id}">
+                      ${followed ? '✓ 已关注' : '+ 关注'}
+                    </button>
+                    <button class="btn btn-ghost btn-sm" data-action="open-msg" data-player-id="${p.id}" data-player-nick="${escapeHtml(p.nick)}" data-player-avatar="${escapeHtml(p.avatar || '🧑')}">✉️ 私信</button>`}
+        </div>
+      </div>`;
+    }).join('');
+  },
+  myProfile() {
+    const p = Data.getProfile();
+    $('#myProfile').innerHTML = `
+      <span class="avatar lg" aria-hidden="true">${p.avatar || '🧑'}</span>
+      <div class="pp-info">
+        <div class="pp-name">${escapeHtml(p.nick)} <span class="badge badge-accent">在线</span></div>
+        <div class="pp-sign">${escapeHtml(p.signature || '这个人很懒，什么都没写')}</div>
+        <div class="pp-stats">
+          <div class="pp-stat"><b>${p.playHours}</b><span>游戏时长（小时）</span></div>
+          <div class="pp-stat"><b>${Data.getPosts().length}</b><span>社区帖子</span></div>
+          <div class="pp-stat"><b>${Data.getFollows().length}</b><span>关注数量</span></div>
+        </div>
+      </div>
+      <button class="btn btn-secondary" data-action="edit-profile">✏️ 编辑资料</button>`;
+  },
+  messages() {
+    const myProfile = Data.getProfile();
+    const all = Data.getMessages();
+    const mine = all.filter(m => m.to === myProfile.nick || m.from === myProfile.nick).sort((a, b) => b.time - a.time);
+    $('#messageList').innerHTML = mine.length ? mine.map(m => {
+      const isFromMe = m.from === myProfile.nick;
+      return `
+        <div class="msg-bubble${isFromMe ? ' mine' : ''}">
+          <div class="mb-head">${isFromMe ? '我' : escapeHtml(m.from)} · ${fmtTime(m.time)}</div>
+          ${escapeHtml(m.content)}
+        </div>`;
+    }).join('') : `<div class="empty-state"><div class="es-icon">📭</div>暂无私信，去找个朋友聊聊吧</div>`;
+  }
+};
 
-    // ─── Init ──────────────────────────────────────────────────────
-    document.addEventListener('DOMContentLoaded', () => {
-      selectPlatform('windows');
+/* ════════════════════════════════════════════════════════════════
+   5. 交互逻辑
+════════════════════════════════════════════════════════════════ */
+let currentPlatform = PLATFORMS[0];
+
+function formatCommand(cmd) {
+  return cmd.split('\n').map(line => {
+    const esc = escapeHtml(line);
+    return `<pre class="command-line">${esc
+      .replace(/^(\s*)([a-zA-Z0-9_./-]+)/, '$1<span class="cmd-keyword">$2</span>')
+      .replace(/(--[\w-]+)/g, '<span class="cmd-flag">$1</span>')
+      .replace(/("https?:\/\/[^"]+")/g, '<span class="cmd-string">$1</span>')}</pre>`;
+  }).join('');
+}
+
+function openModal(overlayId) { $(overlayId).classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeModal(overlayId) { $(overlayId).classList.remove('open'); document.body.style.overflow = ''; }
+
+function renderPostModal(postId) {
+  const posts = Data.getPosts();
+  const post = posts.find(p => p.id === postId);
+  if (!post) return;
+  const myProfile = Data.getProfile();
+  const liked = (post.likes || []).includes(myProfile.nick);
+  const comments = post.comments || [];
+  $('#postModal').innerHTML = `
+    <div class="modal-head">
+      <div class="post-head" style="margin-bottom:0;">
+        <span class="avatar" aria-hidden="true">${post.avatar || '🧑'}</span>
+        <div>
+          <div class="post-author">${escapeHtml(post.author)}</div>
+          <div class="post-time">${fmtTime(post.time)}</div>
+        </div>
+      </div>
+      <button class="modal-close" data-action="close-modal" aria-label="关闭">✕</button>
+    </div>
+    <h3 style="font-size:20px; margin-bottom:12px;">${escapeHtml(post.title)}</h3>
+    <div style="white-space:pre-wrap; color:var(--fg); line-height:1.75; margin-bottom:16px;">${escapeHtml(post.content)}</div>
+    <div class="post-foot" style="margin-bottom:16px;">
+      <button class="action-btn${liked ? ' liked' : ''}" data-action="like-post" data-post-id="${post.id}" aria-label="点赞">
+        <span aria-hidden="true">👍</span> <span data-role="like-count">${(post.likes || []).length}</span>
+      </button>
+      <span class="meta">${comments.length} 条评论</span>
+    </div>
+    <div style="max-height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; margin-bottom:16px;" data-role="comment-list">
+      ${comments.length ? comments.map(c => `
+        <div class="msg-bubble">
+          <div class="mb-head">${escapeHtml(c.author)} · ${fmtTime(c.time)}</div>
+          ${escapeHtml(c.content)}
+        </div>`).join('') : `<div class="meta" style="padding:12px 0; text-align:center;">还没有评论，来抢沙发～</div>`}
+    </div>
+    <form data-role="comment-form">
+      <div class="row" style="gap:10px;">
+        <span class="avatar sm" aria-hidden="true">${myProfile.avatar || '🧑'}</span>
+        <input type="text" data-role="comment-input" maxlength="300" placeholder="写下你的评论…" style="flex:1; background:var(--bg-2); border:1px solid var(--border); border-radius:10px; padding:10px 14px; color:var(--fg);" required />
+        <button class="btn btn-primary btn-sm" type="submit">发送</button>
+      </div>
+    </form>`;
+  openModal('#postModalOverlay');
+}
+
+function renderMsgModal(playerId, playerNick, playerAvatar) {
+  const myProfile = Data.getProfile();
+  const all = Data.getMessages();
+  const thread = all.filter(m => (m.from === myProfile.nick && m.to === playerNick) || (m.from === playerNick && m.to === myProfile.nick)).sort((a, b) => a.time - b.time);
+  $('#msgModal').innerHTML = `
+    <div class="modal-head">
+      <div class="post-head" style="margin-bottom:0;">
+        <span class="avatar" aria-hidden="true">${playerAvatar}</span>
+        <div>
+          <div class="post-author">与 ${escapeHtml(playerNick)} 的私信</div>
+          <div class="post-time">${thread.length} 条消息</div>
+        </div>
+      </div>
+      <button class="modal-close" data-action="close-modal" aria-label="关闭">✕</button>
+    </div>
+    <div class="msg-list" data-role="msg-thread">
+      ${thread.length ? thread.map(m => {
+        const isFromMe = m.from === myProfile.nick;
+        return `<div class="msg-bubble${isFromMe ? ' mine' : ''}">
+          <div class="mb-head">${isFromMe ? '我' : escapeHtml(m.from)} · ${fmtTime(m.time)}</div>
+          ${escapeHtml(m.content)}
+        </div>`;
+      }).join('') : `<div class="empty-state"><div class="es-icon">💬</div>打个招呼，开始对话吧</div>`}
+    </div>
+    <form data-role="msg-form">
+      <div class="row" style="gap:10px;">
+        <input type="text" data-role="msg-input" maxlength="500" placeholder="输入私信内容…" style="flex:1; background:var(--bg-2); border:1px solid var(--border); border-radius:10px; padding:10px 14px; color:var(--fg);" required />
+        <button class="btn btn-primary btn-sm" type="submit">发送</button>
+      </div>
+    </form>`;
+  openModal('#msgModalOverlay');
+}
+
+function renderProfileModal() {
+  const p = Data.getProfile();
+  const AVATARS = ['🌍', '🐱', '🐶', '🚀', '🎮', '🌟', '🐼', '🦊', '🐯', '🐺', '🍀', '🎧'];
+  $('#profileModal').innerHTML = `
+    <div class="modal-head">
+      <h3 style="font-size:20px;">编辑我的资料</h3>
+      <button class="modal-close" data-action="close-modal" aria-label="关闭">✕</button>
+    </div>
+    <form data-role="profile-form">
+      <div class="field">
+        <label for="pfNick">昵称</label>
+        <input type="text" id="pfNick" maxlength="16" value="${escapeHtml(p.nick)}" required />
+      </div>
+      <div class="field">
+        <label>选择头像</label>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;" data-role="avatar-picker">
+          ${AVATARS.map(a => `
+            <button type="button" class="avatar sm" data-avatar="${a}" style="cursor:pointer; font-size:22px; width:42px; height:42px; border:2px solid ${p.avatar === a ? 'var(--accent)' : 'var(--border)'}; background:${p.avatar === a ? 'var(--accent-soft)' : 'var(--surface-light)'};" aria-label="选择头像 ${a}">${a}</button>`).join('')}
+        </div>
+      </div>
+      <div class="field">
+        <label for="pfSignature">签名</label>
+        <input type="text" id="pfSignature" maxlength="40" value="${escapeHtml(p.signature || '')}" placeholder="一句话介绍自己" />
+      </div>
+      <div class="field">
+        <label for="pfHours">游戏时长（小时）</label>
+        <input type="number" id="pfHours" min="0" max="99999" value="${p.playHours}" />
+      </div>
+      <div class="row-between">
+        <button type="button" class="btn btn-ghost" data-action="close-modal">取消</button>
+        <button type="submit" class="btn btn-primary">保存资料</button>
+      </div>
+    </form>`;
+  openModal('#profileModalOverlay');
+}
+
+/* ─── 动作分发（事件委托） ─── */
+function handleAction(e) {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const action = el.dataset.action;
+
+  if (action === 'select-platform') {
+    currentPlatform = PLATFORMS.find(p => p.id === el.dataset.platform) || PLATFORMS[0];
+    Render.platforms();
+    Render.downloadPanel();
+  }
+  else if (action === 'open-post') {
+    renderPostModal(el.dataset.postId);
+  }
+  else if (action === 'like-post') {
+    toggleLike(el.dataset.postId);
+  }
+  else if (action === 'delete-post') {
+    deletePost(el.dataset.postId);
+  }
+  else if (action === 'toggle-follow') {
+    toggleFollow(el.dataset.playerId);
+  }
+  else if (action === 'open-msg') {
+    renderMsgModal(el.dataset.playerId, el.dataset.playerNick, el.dataset.playerAvatar);
+  }
+  else if (action === 'edit-profile') {
+    renderProfileModal();
+  }
+  else if (action === 'close-modal') {
+    const overlay = el.closest('.modal-overlay');
+    if (overlay) closeModal('#' + overlay.id);
+  }
+}
+
+function toggleLike(postId) {
+  const posts = Data.getPosts();
+  const post = posts.find(p => p.id === postId);
+  if (!post) return;
+  const myProfile = Data.getProfile();
+  post.likes = post.likes || [];
+  const idx = post.likes.indexOf(myProfile.nick);
+  if (idx >= 0) post.likes.splice(idx, 1);
+  else post.likes.push(myProfile.nick);
+  Data.savePosts(posts);
+  const open = $('#postModalOverlay').classList.contains('open') && $('#postModal').dataset.postId === postId;
+  Render.posts();
+  if (open) renderPostModal(postId);
+  // 更新点赞数（若当前模态正打开）
+  $$('[data-post-id="' + postId + '"] [data-role="like-count"]').forEach(n => { n.textContent = post.likes.length; });
+  $$('[data-post-id="' + postId + '"]').forEach(n => { n.classList.toggle('liked', post.likes.includes(myProfile.nick)); });
+}
+
+function deletePost(postId) {
+  const posts = Data.getPosts();
+  const post = posts.find(p => p.id === postId);
+  const myProfile = Data.getProfile();
+  if (!post || post.author !== myProfile.nick) { toast('只能删除自己的帖子'); return; }
+  if (!confirm('确定删除这篇帖子吗？')) return;
+  Data.savePosts(posts.filter(p => p.id !== postId));
+  Render.posts();
+  closeModal('#postModalOverlay');
+  toast('帖子已删除');
+}
+
+function toggleFollow(playerId) {
+  const follows = Data.getFollows();
+  const idx = follows.indexOf(playerId);
+  if (idx >= 0) follows.splice(idx, 1);
+  else follows.push(playerId);
+  Data.saveFollows(follows);
+  Render.players();
+  Render.myProfile();
+  Render.homeStats();
+  toast(follows.includes(playerId) ? '已关注' : '已取消关注');
+}
+
+/* ─── 表单提交 ─── */
+function bindForms() {
+  $('#postForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = $('#postTitle').value.trim();
+    const content = $('#postContent').value.trim();
+    if (!title || !content) { toast('请填写标题和内容'); return; }
+    const profile = Data.getProfile();
+    const posts = Data.getPosts();
+    posts.push({
+      id: Store.uid(),
+      author: profile.nick,
+      avatar: profile.avatar || '🧑',
+      time: Date.now(),
+      title,
+      content,
+      likes: [],
+      comments: []
     });
+    Data.savePosts(posts);
+    $('#postForm').reset();
+    Render.posts();
+    Render.homeStats();
+    toast('发布成功！');
+  });
+
+  document.addEventListener('submit', (e) => {
+    const form = e.target;
+    if (form.hasAttribute('data-role')) {
+      const role = form.getAttribute('data-role');
+      if (role === 'comment-form') {
+        e.preventDefault();
+        const input = form.querySelector('[data-role="comment-input"]');
+        const content = input.value.trim();
+        if (!content) { toast('评论不能为空'); return; }
+        const overlay = form.closest('.modal-overlay');
+        const postId = $('#postModal').querySelector('.post-head') ? ($('#postModal').dataset.postId || '') : '';
+        if (!postId) { toast('找不到帖子'); return; }
+        const posts = Data.getPosts();
+        const post = posts.find(p => p.id === postId);
+        if (!post) return;
+        const profile = Data.getProfile();
+        post.comments = post.comments || [];
+        post.comments.push({ id: Store.uid(), author: profile.nick, avatar: profile.avatar || '🧑', content, time: Date.now() });
+        Data.savePosts(posts);
+        renderPostModal(postId);
+        toast('评论已发布');
+      }
+      else if (role === 'msg-form') {
+        e.preventDefault();
+        const input = form.querySelector('[data-role="msg-input"]');
+        const content = input.value.trim();
+        if (!content) { toast('私信不能为空'); return; }
+        const profile = Data.getProfile();
+        // 从当前模态获取对方昵称
+        const modal = form.closest('.modal');
+        const nickEl = modal.querySelector('.post-author');
+        const toNick = nickEl ? nickEl.textContent.replace('与 ', '').replace(' 的私信', '') : '';
+        if (!toNick) { toast('获取对方信息失败'); return; }
+        const messages = Data.getMessages();
+        messages.push({ id: Store.uid(), from: profile.nick, to: toNick, content, time: Date.now() });
+        Data.saveMessages(messages);
+        renderMsgModal(toNick, toNick, '🧑');
+        toast('私信已发送');
+      }
+      else if (role === 'profile-form') {
+        e.preventDefault();
+        const nick = $('#pfNick').value.trim();
+        if (!nick) { toast('昵称不能为空'); return; }
+        const picked = form.querySelector('[data-avatar].picked') || form.querySelector('[data-avatar]');
+        const avatar = picked ? picked.dataset.avatar : '🌍';
+        const profile = Data.getProfile();
+        const updated = {
+          ...profile,
+          nick,
+          avatar,
+          signature: $('#pfSignature').value.trim(),
+          playHours: Math.max(0, Number($('#pfHours').value) || 0)
+        };
+        Data.saveProfile(updated);
+        Data.upsertPlayer({ id: 'me', ...updated });
+        closeModal('#profileModalOverlay');
+        Render.myProfile();
+        Render.players();
+        Render.posts();
+        $('#postAsLabel').textContent = `发布为：${updated.nick}`;
+        toast('资料已保存');
+      }
+    }
+  });
+
+  /* 头像选择 */
+  document.addEventListener('click', (e) => {
+    const picker = e.target.closest('[data-role="avatar-picker"] [data-avatar]');
+    if (!picker) return;
+    $$('[data-role="avatar-picker"] [data-avatar]').forEach(b => {
+      b.style.borderColor = 'var(--border)';
+      b.style.background = 'var(--surface-light)';
+      b.classList.remove('picked');
+    });
+    picker.style.borderColor = 'var(--accent)';
+    picker.style.background = 'var(--accent-soft)';
+    picker.classList.add('picked');
+  });
+}
+
+function bindGlobal() {
+  /* 平台下载 */
+  $('#mainDownloadBtn').addEventListener('click', () => {
+    const url = $('#mainDownloadBtn').dataset.platformUrl;
+    if (url) window.open(url, '_blank', 'noopener');
+  });
+
+  /* 命令行面板 */
+  $('#cliInstallBtn').addEventListener('click', () => {
+    $('#commandPanel').classList.toggle('visible');
+  });
+
+  /* 复制命令 */
+  $('#copyBtn').addEventListener('click', async () => {
+    const cmd = currentPlatform.command;
+    try {
+      await navigator.clipboard.writeText(cmd);
+      const btn = $('#copyBtn');
+      btn.classList.add('copied');
+      btn.textContent = '✓ 已复制';
+      setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋 复制命令'; }, 1800);
+    } catch (err) {
+      toast('复制失败，请手动复制');
+    }
+  });
+
+  /* 搜索玩家 */
+  $('#playerSearch').addEventListener('input', () => Render.players());
+  $('#playerSearchClear').addEventListener('click', () => { $('#playerSearch').value = ''; Render.players(); });
+
+  /* 动作委托 */
+  document.addEventListener('click', handleAction);
+
+  /* 模态遮罩点击关闭 */
+  $$('.modal-overlay').forEach(ov => {
+    ov.addEventListener('click', (e) => {
+      if (e.target === ov) closeModal('#' + ov.id);
+    });
+  });
+
+  /* 导航 */
+  $$('[data-nav]').forEach(btn => {
+    btn.addEventListener('click', () => navigate(btn.dataset.nav));
+  });
+
+  /* 汉堡菜单 */
+  $('#navToggle').addEventListener('click', () => {
+    const nav = $('#mainNav');
+    const open = nav.classList.toggle('open');
+    $('#navToggle').setAttribute('aria-expanded', String(open));
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   6. 导航路由（hash）
+════════════════════════════════════════════════════════════════ */
+const NAV_MAP = ['home', 'game', 'download', 'community', 'players'];
+
+function navigate(name) {
+  if (!NAV_MAP.includes(name)) name = 'home';
+  $$('.page').forEach(p => p.classList.remove('active'));
+  const page = $(`[data-page="${name}"]`);
+  if (page) page.classList.add('active');
+  $$('.nav-link').forEach(b => b.classList.toggle('active', b.dataset.nav === name));
+  $('#mainNav').classList.remove('open');
+  $('#navToggle').setAttribute('aria-expanded', 'false');
+  location.hash = name;
+  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+  if (name === 'players') Render.players();
+}
+
+function routeFromHash() {
+  const hash = location.hash.replace('#', '');
+  navigate(NAV_MAP.includes(hash) ? hash : 'home');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   7. 初始化
+════════════════════════════════════════════════════════════════ */
+function init() {
+  Render.platforms();
+  Render.downloadPanel();
+  Render.features();
+  Render.screenshots();
+  Render.changelog();
+  Render.requirements();
+  Render.homeStats();
+  Render.announcements();
+  Render.posts();
+  Render.players();
+  Render.myProfile();
+  Render.messages();
+  bindForms();
+  bindGlobal();
+  $('#postAsLabel').textContent = `发布为：${Data.getProfile().nick}`;
+  routeFromHash();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+window.addEventListener('hashchange', routeFromHash);
   </script>
 </body>
 </html>
