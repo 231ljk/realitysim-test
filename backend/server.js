@@ -16,11 +16,13 @@ fs.mkdirSync(path.join(config.ROOT, 'data'), { recursive: true });
 const app = express();
 app.use(express.json({ limit: '5mb' }));
 
-// CORS
+// CORS（origin 为 'null' 表示 file:// 本地打开，放行便于本地调试）
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin && (config.CORS_ORIGINS.includes('*') || config.CORS_ORIGINS.includes(origin))) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
+  const allowAll = config.CORS_ORIGINS.includes('*');
+  const allowed = allowAll || (origin && (config.CORS_ORIGINS.includes(origin) || origin === 'null'));
+  if (allowed) {
+    res.setHeader('Access-Control-Allow-Origin', allowAll ? (origin || '*') : origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
   }
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');

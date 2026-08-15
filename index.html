@@ -823,6 +823,8 @@
       .chat-main { display: none; }
       .chat-main.visible { display: flex; }
       .chat-back-btn { display: inline-flex; }
+      /* 移动端不展示命令行安装方式 */
+      #cliInstallBtn, .command-panel { display: none !important; }
     }
   </style>
 </head>
@@ -842,7 +844,6 @@
         <button class="nav-link" data-nav="download">下载</button>
         <button class="nav-link" data-nav="community">社区</button>
         <button class="nav-link" data-nav="players">玩家广场</button>
-        <button class="nav-link" data-nav="chat">聊天</button>
       </nav>
       <div class="nav-user" id="navUser">
         <button class="btn btn-primary btn-sm nav-cta" data-nav="download">立即下载</button>
@@ -1034,6 +1035,10 @@
             <p class="eyebrow">COMMUNITY · 玩家社区</p>
             <h2>与千万玩家一起分享人生</h2>
           </div>
+          <div class="row-between" style="margin-bottom: var(--gap-md);">
+            <span class="meta">社区 = 发帖交流 + 实时聊天，登录后即可参与</span>
+            <button class="btn btn-secondary" data-nav="chat">💬 进入聊天室 →</button>
+          </div>
           <div class="community-layout">
             <div>
               <div class="panel" style="margin-bottom: var(--gap-lg);">
@@ -1123,14 +1128,15 @@
               <!-- 登录表单 -->
               <form class="auth-form active" id="loginForm" data-role="login-form" novalidate>
                 <div class="field">
-                  <label for="loginAccount">账号</label>
-                  <input type="text" id="loginAccount" maxlength="32" placeholder="请输入账号" autocomplete="username" required />
+                  <label for="loginAccount">账号（用户名 / 手机号 / 邮箱）</label>
+                  <input type="text" id="loginAccount" maxlength="64" placeholder="用户名 / 手机号 / 邮箱，任一即可登录" autocomplete="username" required />
                 </div>
                 <div class="field">
                   <label for="loginPassword">密码</label>
                   <input type="password" id="loginPassword" maxlength="64" placeholder="请输入密码" autocomplete="current-password" required />
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:100%;">登 录</button>
+                <p class="meta" style="margin-top:10px;text-align:center;">支持用户名、手机号、邮箱任一方式登录</p>
                 <div class="auth-foot">还没有账号？<button type="button" class="auth-link" data-switch-auth="register">立即注册</button></div>
               </form>
 
@@ -1141,8 +1147,16 @@
                   <input type="text" id="regNick" maxlength="16" placeholder="最多 16 个字符" required />
                 </div>
                 <div class="field">
-                  <label for="regAccount">账号</label>
-                  <input type="text" id="regAccount" maxlength="32" placeholder="用于登录，4-32 位字符" autocomplete="username" required />
+                  <label for="regAccount">用户名</label>
+                  <input type="text" id="regAccount" maxlength="32" placeholder="用于登录，3-20 位字母/数字/下划线" autocomplete="username" required />
+                </div>
+                <div class="field">
+                  <label for="regPhone">手机号（选填）</label>
+                  <input type="tel" id="regPhone" maxlength="11" placeholder="11 位大陆手机号，绑定后可用于登录" autocomplete="tel" />
+                </div>
+                <div class="field">
+                  <label for="regEmail">邮箱（选填）</label>
+                  <input type="email" id="regEmail" maxlength="64" placeholder="邮箱地址，绑定后可用于登录" autocomplete="email" />
                 </div>
                 <div class="field">
                   <label for="regPassword">密码</label>
@@ -1573,6 +1587,9 @@ const Data = {
   getCurrentUser() {
     const s = this.getSession();
     if (!s) return null;
+    // 真实后端模式：会话直接缓存用户信息
+    if (s.user) return s.user;
+    // 本地模拟模式：从本地用户表查找
     const users = this.getUsers();
     return users.find(u => u.account === s.account) || null;
   },
@@ -1952,22 +1969,24 @@ const Render = {
  *   useMock = false → 走真实后端接口（部署后端后切换）
  *
  * 真实后端接口约定（REST）：
- *   POST {BASE_URL}/api/auth/register  注册    body: { account, password, nick, avatar, color }
- *   POST {BASE_URL}/api/auth/login     登录    body: { account, password } → { token, user }
- *   POST {BASE_URL}/api/auth/logout    退出    header: Authorization: Bearer <token>
- *   GET  {BASE_URL}/api/auth/profile   获取当前用户（header: token）
- *   GET  {BASE_URL}/api/chat/convs     拉取会话列表（header: token）
- *   GET  {BASE_URL}/api/chat/messages?convId=xxx  拉取消息
- *   POST {BASE_URL}/api/chat/send      发送消息 body: { convId, type, content }
+ *   POST {BASE_URL}/api/auth/register  注册    body: { username, phone, email, password, nickname, avatar }
+ *   POST {BASE_URL}/api/auth/login     登录    body: { login, password } → { token, user }
+ *   GET  {BASE_URL}/api/auth/me        获取当前用户（header: Bearer token）
+ *   POST {BASE_URL}/api/auth/bind      绑定手机号/邮箱（header: Bearer token）
+ *   GET  {BASE_URL}/api/auth/admin/users  管理员用户列表（header: Bearer token）
+ *   POST {BASE_URL}/api/chat/convs     创建会话（header: Bearer token）
+ *   GET  {BASE_URL}/api/chat/convs     拉取会话列表（header: Bearer token）
+ *   GET  {BASE_URL}/api/chat/convs/:id/messages  拉取消息
+ *   POST {BASE_URL}/api/chat/convs/:id/messages  发送消息
  *   POST {BASE_URL}/api/upload         上传图片 / 语音 → { url }
  *
  * WebSocket 实时通道（聊天推送）：
  *   ws://{BASE_URL}/ws/chat  连接后服务端推送消息事件
  */
 const API_CONFIG = {
-  BASE_URL: 'https://api.realitysim.example.com', // TODO: 部署后替换为真实后端域名
-  useMock: true,
-  WS_URL: 'ws://api.realitysim.example.com/ws/chat' // TODO: 部署后替换；useMock=true 时不建立连接
+  BASE_URL: 'http://localhost:3000', // 本地后端；部署到服务器后替换为真实域名（如 https://api.realitysim.com）
+  useMock: false,                    // false = 连接真实后端（本机需先启动后端服务：node server.js）
+  WS_URL: 'ws://localhost:3000/ws/chat'
 };
 
 /* 通用请求封装：useMock=false 时启用，useMock=true 时各 Auth/Chat 方法走本地模拟 */
@@ -1992,7 +2011,7 @@ let currentPlatform = PLATFORMS[0];
    5.1 Auth 模块（登录 / 注册 / 登出）
 ════════════════════════════════════════════════════════════════ */
 const Auth = {
-  async register({ nick, account, password, avatar, color }) {
+  async register({ nick, account, phone, email, password, avatar, color }) {
     if (API_CONFIG.useMock) {
       const users = Data.getUsers();
       if (users.some(u => u.account === account)) {
@@ -2006,10 +2025,16 @@ const Auth = {
     // 真实后端：POST {BASE_URL}/api/auth/register
     const res = await apiRequest('/api/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ nick, account, password, avatar, color })
+      body: JSON.stringify({
+        username: account || null,
+        phone: phone || null,
+        email: email || null,
+        password,
+        nickname: nick,
+        avatar: avatar || '🧑'
+      })
     });
-    Data.saveSession({ account: res.user.account, token: res.token });
-    return res.user;
+    return Auth._applySession(res);
   },
 
   async login(account, password) {
@@ -2020,13 +2045,26 @@ const Auth = {
       Data.saveSession({ account: user.account, token: 'mock-token-' + Store.uid() });
       return user;
     }
-    // 真实后端：POST {BASE_URL}/api/auth/login
+    // 真实后端：POST {BASE_URL}/api/auth/login（login 字段支持用户名/手机号/邮箱）
     const res = await apiRequest('/api/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ account, password })
+      body: JSON.stringify({ login: account, password })
     });
-    Data.saveSession({ account: res.user.account, token: res.token });
-    return res.user;
+    return Auth._applySession(res);
+  },
+
+  /* 将后端 user 映射为前端格式并保存会话 */
+  _applySession(res) {
+    const u = res.user || {};
+    const mapped = {
+      account: u.username || u.phone || u.email || '',
+      nick: u.nickname || u.username || u.phone || u.email || '玩家',
+      avatar: u.avatar || '🧑',
+      role: u.role || 'user',
+      id: u.id
+    };
+    Data.saveSession({ account: mapped.account, token: res.token, user: mapped });
+    return mapped;
   },
 
   async logout() {
@@ -2034,8 +2072,7 @@ const Auth = {
       Data.clearSession();
       return;
     }
-    // 真实后端：POST {BASE_URL}/api/auth/logout
-    try { await apiRequest('/api/auth/logout', { method: 'POST' }); } catch (e) { /* 忽略登出失败 */ }
+    // 真实后端无独立登出接口：直接清除本地会话
     Data.clearSession();
   }
 };
@@ -2613,18 +2650,22 @@ function bindForms() {
         e.preventDefault();
         const nick = $('#regNick').value.trim();
         const account = $('#regAccount').value.trim();
+        const phone = $('#regPhone').value.trim();
+        const email = $('#regEmail').value.trim();
         const password = $('#regPassword').value;
         const confirm = $('#regConfirm').value;
-        if (!nick || !account || !password) { toast('请填写昵称、账号和密码'); return; }
-        if (account.length < 4) { toast('账号至少 4 位'); return; }
+        if (!nick || !account || !password) { toast('请填写昵称、用户名和密码'); return; }
+        if (account.length < 3) { toast('用户名至少 3 位'); return; }
         if (password.length < 6) { toast('密码至少 6 位'); return; }
         if (password !== confirm) { toast('两次输入的密码不一致'); return; }
+        if (phone && !/^1[3-9]\d{9}$/.test(phone)) { toast('手机号格式不正确'); return; }
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('邮箱格式不正确'); return; }
         const picked = form.querySelector('[data-avatar].picked') || form.querySelector('[data-avatar]');
         const colorPicked = form.querySelector('[data-color].picked') || form.querySelector('[data-color]');
         const avatar = picked ? picked.dataset.avatar : '🧑';
         const color = colorPicked ? colorPicked.dataset.color : '#00d67d';
         try {
-          const user = await Auth.register({ nick, account, password, avatar, color });
+          const user = await Auth.register({ nick, account, phone, email, password, avatar, color });
           syncProfileFromUser(user);
           Render.navUser();
           Render.myProfile();

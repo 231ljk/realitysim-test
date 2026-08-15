@@ -11,7 +11,7 @@ module.exports = {
   JWT_EXPIRES: process.env.JWT_EXPIRES || '7d',
   DB_PATH: path.join(ROOT, process.env.DB_PATH || 'data/realitysim.db'),
   UPLOAD_DIR: path.join(ROOT, process.env.UPLOAD_DIR || 'uploads'),
-  CORS_ORIGINS: (process.env.CORS_ORIGIN || 'http://localhost:8080')
+  CORS_ORIGINS: (process.env.CORS_ORIGIN || '*')
     .split(',').map(s => s.trim()).filter(Boolean),
   PUBLIC_BASE_URL: (process.env.PUBLIC_BASE_URL || '').replace(/\/$/, ''),
   // 内置管理员
