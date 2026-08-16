@@ -181,6 +181,26 @@ CREATE TABLE IF NOT EXISTS post_comments (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_post_comments_post ON post_comments(post_id, id);
+
+CREATE TABLE IF NOT EXISTS friendships (
+  user_id INTEGER NOT NULL,
+  friend_id INTEGER NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (user_id, friend_id)
+);
+CREATE INDEX IF NOT EXISTS idx_friendships_friend ON friendships(friend_id, user_id);
+
+CREATE TABLE IF NOT EXISTS friend_requests (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  from_user_id INTEGER NOT NULL,
+  to_user_id INTEGER NOT NULL,
+  message TEXT DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'pending',
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  handled_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_fr_to ON friend_requests(to_user_id, status, id);
+CREATE INDEX IF NOT EXISTS idx_fr_from ON friend_requests(from_user_id, status, id);
 ''')
     conn.commit()
 
@@ -211,6 +231,9 @@ CREATE INDEX IF NOT EXISTS idx_post_comments_post ON post_comments(post_id, id);
     ensure_column('users', 'play_hours', 'REAL NOT NULL DEFAULT 0')
     ensure_column('users', 'game_status', "TEXT NOT NULL DEFAULT 'offline'")
     ensure_column('users', 'last_heartbeat_at', 'TEXT')
+    ensure_column('users', 'lat', 'REAL')
+    ensure_column('users', 'lng', 'REAL')
+    ensure_column('users', 'last_location_at', 'TEXT')
     conn.commit()
 
     # 旧库迁移：早期 username 为 NOT NULL，无法支持纯手机号/邮箱注册（username 可为 NULL）
@@ -242,6 +265,22 @@ ALTER TABLE users_new RENAME TO users;
 COMMIT;
 ''')
         conn.commit()
+
+    # 迁移后再次补齐可能因重建丢失的新列
+    ensure_column('users', 'phone', 'TEXT')
+    ensure_column('users', 'email', 'TEXT')
+    ensure_column('users', 'role', "TEXT NOT NULL DEFAULT 'user'")
+    ensure_column('users', 'status', "TEXT NOT NULL DEFAULT 'normal'")
+    ensure_column('users', 'whitelisted', 'INTEGER NOT NULL DEFAULT 0')
+    ensure_column('users', 'banned_reason', "TEXT DEFAULT ''")
+    ensure_column('users', 'last_login_at', 'TEXT')
+    ensure_column('users', 'play_hours', 'REAL NOT NULL DEFAULT 0')
+    ensure_column('users', 'game_status', "TEXT NOT NULL DEFAULT 'offline'")
+    ensure_column('users', 'last_heartbeat_at', 'TEXT')
+    ensure_column('users', 'lat', 'REAL')
+    ensure_column('users', 'lng', 'REAL')
+    ensure_column('users', 'last_location_at', 'TEXT')
+    conn.commit()
 
     conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_phone ON users(phone)')
     conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email)')

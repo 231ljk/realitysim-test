@@ -11,7 +11,7 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_sock import Sock
 
-from src import admin, auth, chat, db, game, posts
+from src import admin, auth, chat, db, friends, game, posts
 from src.config import CORS_ORIGINS, PORT, ROOT, UPLOAD_DIR
 
 app = Flask(__name__)
@@ -35,6 +35,7 @@ app.register_blueprint(admin.router)
 app.register_blueprint(chat.router)
 app.register_blueprint(posts.router)
 app.register_blueprint(game.router)
+app.register_blueprint(friends.router)
 
 
 @app.get('/')
