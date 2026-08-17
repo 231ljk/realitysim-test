@@ -37,6 +37,10 @@ app.register_blueprint(posts.router)
 app.register_blueprint(game.router)
 app.register_blueprint(friends.router)
 
+# 启动时确保内置管理员存在（模块加载即执行，兼容 gunicorn 等 WSGI 启动方式）
+with app.app_context():
+    auth.seed_admin()
+
 
 @app.get('/')
 def index():
@@ -109,7 +113,5 @@ chat.register_ws(sock)
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        auth.seed_admin()
     print(f'[realitysim-backend-py] 启动成功: http://localhost:{PORT}')
     app.run(host='0.0.0.0', port=PORT, debug=False, threaded=True)

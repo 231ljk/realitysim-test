@@ -51,6 +51,12 @@ UPLOAD_DIR = str(ROOT / _env('UPLOAD_DIR', 'uploads'))
 CORS_ORIGINS = [s.strip() for s in _env('CORS_ORIGIN', '*').split(',') if s.strip()]
 PUBLIC_BASE_URL = _env('PUBLIC_BASE_URL', '').rstrip('/')
 
+# 数据库模式：sqlite（本地文件，默认）/ turso（云端 SQLite 托管，免费 PaaS 部署用）
+DB_TYPE = _env('DB_TYPE', 'sqlite').strip().lower()
+# Turso 连接信息（DB_TYPE=turso 时必填）：libsql://xxx.turso.io 与 Auth Token
+TURSO_DATABASE_URL = _env('TURSO_DATABASE_URL', '').strip()
+TURSO_AUTH_TOKEN = _env('TURSO_AUTH_TOKEN', '').strip()
+
 # 内置管理员
 ADMIN_USERNAME = _env('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = _env('ADMIN_PASSWORD', 'admin123456')

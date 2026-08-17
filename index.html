@@ -826,6 +826,108 @@
       /* 移动端不展示命令行安装方式 */
       #cliInstallBtn, .command-panel { display: none !important; }
     }
+
+    /* ═══ 大厂风格登录：验证码 / 第三方品牌 ═══ */
+    .auth-sub-tabs { display: flex; gap: 8px; margin-bottom: 18px; padding: 4px; background: var(--surface-light); border: 1px solid var(--border-soft); border-radius: 12px; }
+    .auth-sub-tab { flex: 1; padding: 9px 0; border: 0; background: transparent; color: var(--fg-muted); font-size: 14px; font-weight: 600; border-radius: 9px; cursor: pointer; transition: all .18s ease; }
+    .auth-sub-tab.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,.18); }
+    .login-mode { display: block; }
+    .login-code-channels { display: flex; gap: 18px; }
+    .code-channel { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--fg); cursor: pointer; }
+    .code-input-row { display: flex; gap: 10px; }
+    .code-input-row input { flex: 1; }
+    .code-input-row .btn { flex-shrink: 0; }
+    .oauth-divider { display: flex; align-items: center; gap: 14px; margin: 20px 0 14px; color: var(--fg-muted); font-size: 12px; }
+    .oauth-divider::before, .oauth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-soft); }
+    .oauth-row { display: flex; gap: 10px; justify-content: space-between; }
+    .oauth-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px; border: 1px solid var(--border-soft); border-radius: 12px; background: var(--surface-light); color: var(--fg); font-size: 12px; cursor: pointer; transition: all .18s ease; }
+    .oauth-btn:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+    .oauth-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; }
+    .oi-wechat { background: #07c160; }
+    .oi-qq { background: #12b7f5; }
+    .oi-douyin { background: #161823; }
+    .oi-ms { background: #0078d4; }
+
+    /* ═══ 管理后台 ═══ */
+    .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; }
+    .admin-stat { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 18px 12px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 14px; }
+    .as-num { font-size: 26px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+    .as-label { font-size: 13px; color: var(--fg-muted); }
+    .admin-filter { display: flex; gap: 10px; flex-wrap: wrap; }
+    .admin-filter input { flex: 1; min-width: 200px; }
+    .admin-filter select { padding: 9px 12px; border: 1px solid var(--border-soft); border-radius: 10px; background: var(--surface); color: var(--fg); font-size: 14px; }
+    .table-wrap { overflow-x: auto; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .admin-table th, .admin-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-soft); white-space: nowrap; }
+    .admin-table th { color: var(--fg-muted); font-weight: 600; font-size: 13px; background: var(--surface-light); }
+    .admin-table tr:hover td { background: var(--accent-soft); }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .badge-ok { background: rgba(0,214,125,.15); color: #00d67d; }
+    .badge-warn { background: rgba(255,165,2,.15); color: #ffa502; }
+    .badge-danger { background: rgba(255,71,87,.15); color: #ff4757; }
+    .badge-muted { background: var(--surface-light); color: var(--fg-muted); }
+    .admin-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .admin-actions button { padding: 4px 10px; font-size: 12px; border-radius: 8px; border: 1px solid var(--border-soft); background: var(--surface-light); color: var(--fg); cursor: pointer; transition: all .15s ease; }
+    .admin-actions button:hover { border-color: var(--accent); color: var(--accent); }
+    .admin-actions button.danger:hover { border-color: #ff4757; color: #ff4757; }
+    .admin-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+    .admin-list-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 12px; background: var(--surface-light); border: 1px solid var(--border-soft); border-radius: 10px; font-size: 13px; }
+    .admin-list-item .reason { color: var(--fg-muted); font-size: 12px; }
+
+    /* ═══ 管理后台 v2：多 Tab ═══ */
+    .admin-tabs { display: flex; gap: 8px; flex-wrap: wrap; padding: 6px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 14px; }
+    .admin-tab { padding: 9px 16px; border: 0; border-radius: 10px; background: transparent; color: var(--fg-muted); font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s ease; }
+    .admin-tab:hover { color: var(--fg); background: var(--surface-light); }
+    .admin-tab.active { background: var(--accent-soft); color: var(--accent); }
+    .admin-panel { display: flex; flex-direction: column; gap: var(--gap-md); }
+    .admin-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .admin-bar input[type="search"], .admin-bar input[type="text"] { flex: 1; min-width: 200px; }
+    .admin-bar .spacer { flex: 1; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .stat-card { padding: 16px 14px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 14px; }
+    .stat-card .sc-label { font-size: 12px; color: var(--fg-muted); }
+    .stat-card .sc-num { font-size: 24px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; margin-top: 4px; }
+    .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 860px) { .chart-row { grid-template-columns: 1fr; } }
+    .chart-panel { padding: 14px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 14px; }
+    .chart-panel .cp-title { font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--fg); }
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+    .bar-row .b-label { width: 64px; color: var(--fg-muted); flex-shrink: 0; }
+    .bar-track { flex: 1; height: 10px; background: var(--surface-light); border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #00d67d); border-radius: 999px; min-width: 2px; }
+    .bar-row .b-val { width: 40px; text-align: right; font-variant-numeric: tabular-nums; }
+    .oauth-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .oauth-chip { padding: 5px 12px; border-radius: 999px; font-size: 12px; background: var(--surface-light); border: 1px solid var(--border-soft); color: var(--fg-muted); }
+    .pager { display: flex; align-items: center; gap: 12px; justify-content: center; padding: 8px 0; }
+    .pager button { padding: 6px 14px; border: 1px solid var(--border-soft); border-radius: 8px; background: var(--surface); color: var(--fg); cursor: pointer; }
+    .pager button:disabled { opacity: .4; cursor: not-allowed; }
+    .pager .pg-info { font-size: 13px; color: var(--fg-muted); }
+    .batch-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .batch-bar button { padding: 6px 12px; font-size: 12px; border-radius: 8px; border: 1px solid var(--border-soft); background: var(--surface-light); color: var(--fg); cursor: pointer; }
+    .batch-bar button:hover { border-color: var(--accent); color: var(--accent); }
+    .batch-bar button.danger:hover { border-color: #ff4757; color: #ff4757; }
+    .check-cell { width: 34px; text-align: center !important; }
+    .admin-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 13px; margin-bottom: 14px; }
+    @media (max-width: 640px) { .admin-detail-grid { grid-template-columns: 1fr; } }
+    .admin-detail-grid dt { color: var(--fg-muted); }
+    .admin-detail-grid dd { margin: 0; color: var(--fg); word-break: break-all; }
+    .sub-panel { padding: 12px 14px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 12px; margin-bottom: 12px; }
+    .sub-panel .sp-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+    .admin-table .empty-state { color: var(--fg-muted); text-align: center; }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch .slider { position: absolute; cursor: pointer; inset: 0; background: var(--surface-light); border: 1px solid var(--border-soft); border-radius: 999px; transition: all .2s; }
+    .switch .slider:before { content: ''; position: absolute; width: 18px; height: 18px; left: 2px; top: 2px; background: var(--fg-muted); border-radius: 50%; transition: all .2s; }
+    .switch input:checked + .slider { background: rgba(0,214,125,.3); border-color: var(--accent); }
+    .switch input:checked + .slider:before { transform: translateX(20px); background: var(--accent); }
+    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+    .settings-card { padding: 16px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 14px; }
+    .settings-card .sc-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; }
+    .setting-row .s-label { font-size: 14px; }
+    .setting-row .s-desc { font-size: 12px; color: var(--fg-muted); margin-top: 2px; }
+    #adminDetailOverlay .modal { max-width: 720px; width: calc(100vw - 40px); max-height: 85vh; overflow-y: auto; }
+    #announcementModal .modal { max-width: 560px; width: calc(100vw - 40px); }
   </style>
 </head>
 <body>
@@ -844,6 +946,7 @@
         <button class="nav-link" data-nav="download">下载</button>
         <button class="nav-link" data-nav="community">社区</button>
         <button class="nav-link" data-nav="players">玩家广场</button>
+        <button class="nav-link" id="adminNavLink" data-nav="admin" hidden>管理后台</button>
       </nav>
       <div class="nav-user" id="navUser">
         <button class="btn btn-primary btn-sm nav-cta" data-nav="download">立即下载</button>
@@ -1125,18 +1228,59 @@
                 <button class="auth-tab" data-auth-tab="register" role="tab" aria-selected="false">注册</button>
               </div>
 
-              <!-- 登录表单 -->
+              <!-- 登录表单（大厂风格：密码登录 / 验证码登录 / 第三方品牌登录） -->
               <form class="auth-form active" id="loginForm" data-role="login-form" novalidate>
-                <div class="field">
-                  <label for="loginAccount">账号（用户名 / 手机号 / 邮箱）</label>
-                  <input type="text" id="loginAccount" maxlength="64" placeholder="用户名 / 手机号 / 邮箱，任一即可登录" autocomplete="username" required />
+                <div class="auth-sub-tabs" role="tablist" aria-label="登录方式">
+                  <button type="button" class="auth-sub-tab active" data-login-mode="pwd" role="tab" aria-selected="true">密码登录</button>
+                  <button type="button" class="auth-sub-tab" data-login-mode="code" role="tab" aria-selected="false">验证码登录</button>
                 </div>
-                <div class="field">
-                  <label for="loginPassword">密码</label>
-                  <input type="password" id="loginPassword" maxlength="64" placeholder="请输入密码" autocomplete="current-password" required />
+
+                <!-- 密码登录 -->
+                <div class="login-mode" data-login-mode-panel="pwd">
+                  <div class="field">
+                    <label for="loginAccount">账号（用户名 / 手机号 / 邮箱）</label>
+                    <input type="text" id="loginAccount" maxlength="64" placeholder="用户名 / 手机号 / 邮箱，任一即可登录" autocomplete="username" required />
+                  </div>
+                  <div class="field">
+                    <label for="loginPassword">密码</label>
+                    <input type="password" id="loginPassword" maxlength="64" placeholder="请输入密码" autocomplete="current-password" required />
+                  </div>
+                  <button type="submit" class="btn btn-primary" style="width:100%;">登 录</button>
+                  <p class="meta" style="margin-top:10px;text-align:center;">支持用户名、手机号、邮箱任一方式登录</p>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width:100%;">登 录</button>
-                <p class="meta" style="margin-top:10px;text-align:center;">支持用户名、手机号、邮箱任一方式登录</p>
+
+                <!-- 验证码登录（未注册自动注册） -->
+                <div class="login-mode" data-login-mode-panel="code" hidden>
+                  <div class="field">
+                    <label>账号类型</label>
+                    <div class="login-code-channels">
+                      <label class="code-channel"><input type="radio" name="codeChannel" value="phone" checked /> 手机号</label>
+                      <label class="code-channel"><input type="radio" name="codeChannel" value="email" /> 邮箱</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="loginCodeTarget">手机号 / 邮箱</label>
+                    <div class="code-input-row">
+                      <input type="text" id="loginCodeTarget" maxlength="64" placeholder="请输入手机号或邮箱" autocomplete="off" />
+                      <button type="button" class="btn btn-secondary btn-sm" id="sendCodeBtn" style="white-space:nowrap;">获取验证码</button>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="loginCode">验证码</label>
+                    <input type="text" id="loginCode" maxlength="6" placeholder="6 位验证码" inputmode="numeric" autocomplete="one-time-code" />
+                  </div>
+                  <button type="submit" class="btn btn-primary" style="width:100%;">登录 / 注册</button>
+                  <p class="meta" style="margin-top:10px;text-align:center;">未注册的手机号 / 邮箱验证通过后将自动注册</p>
+                </div>
+
+                <!-- 第三方品牌登录 -->
+                <div class="oauth-divider"><span>或使用以下方式登录</span></div>
+                <div class="oauth-row">
+                  <button type="button" class="oauth-btn oauth-wechat" data-oauth="wechat" title="微信登录"><span class="oauth-icon oi-wechat">微</span>微信</button>
+                  <button type="button" class="oauth-btn oauth-qq" data-oauth="qq" title="QQ 登录"><span class="oauth-icon oi-qq">Q</span>QQ</button>
+                  <button type="button" class="oauth-btn oauth-douyin" data-oauth="douyin" title="抖音登录"><span class="oauth-icon oi-douyin">抖</span>抖音</button>
+                  <button type="button" class="oauth-btn oauth-ms" data-oauth="microsoft" title="微软登录"><span class="oauth-icon oi-ms">M</span>微软</button>
+                </div>
                 <div class="auth-foot">还没有账号？<button type="button" class="auth-link" data-switch-auth="register">立即注册</button></div>
               </form>
 
@@ -1202,6 +1346,249 @@
         </div>
       </div>
     </section>
+
+    <!-- ═══════════ PAGE: ADMIN（管理员后台） ═══════════ -->
+    <section class="page" id="page-admin" data-page="admin">
+      <div class="section">
+        <div class="container stack" style="gap: var(--gap-lg);">
+          <div class="section-head">
+            <p class="eyebrow">ADMIN · 管理后台</p>
+            <h2>管理员控制台</h2>
+            <p class="lead">统计、用户、日志、内容与系统设置一站式管理。</p>
+          </div>
+
+          <!-- Tab 切换 -->
+          <div class="admin-tabs" role="tablist" aria-label="管理后台功能">
+            <button class="admin-tab active" data-admin-tab="dashboard" role="tab">📊 仪表盘</button>
+            <button class="admin-tab" data-admin-tab="users" role="tab">👥 用户管理</button>
+            <button class="admin-tab" data-admin-tab="login-logs" role="tab">🔑 登录日志</button>
+            <button class="admin-tab" data-admin-tab="audit-logs" role="tab">📝 审计日志</button>
+            <button class="admin-tab" data-admin-tab="announcements" role="tab">📢 公告管理</button>
+            <button class="admin-tab" data-admin-tab="words" role="tab">🚫 敏感词</button>
+            <button class="admin-tab" data-admin-tab="settings" role="tab">⚙️ 系统设置</button>
+          </div>
+
+          <!-- ① 仪表盘 -->
+          <div class="admin-panel" data-admin-panel="dashboard">
+            <div class="stat-grid" id="dashUserStats"></div>
+            <div class="chart-row">
+              <div class="chart-panel">
+                <div class="cp-title">📈 7 日注册趋势</div>
+                <div id="dashTrend"><div class="empty-state" style="padding:12px;">加载中…</div></div>
+              </div>
+              <div class="chart-panel">
+                <div class="cp-title">🔗 OAuth 绑定分布</div>
+                <div class="oauth-chips" id="dashOAuth"><span class="empty-state">加载中…</span></div>
+                <div class="cp-title" style="margin-top:14px;">🛣️ 登录渠道分布</div>
+                <div id="dashChannel"><div class="empty-state" style="padding:12px;">加载中…</div></div>
+              </div>
+            </div>
+            <div class="chart-panel">
+              <div class="cp-title">📊 实时数据</div>
+              <div id="dashExtras" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+            </div>
+          </div>
+
+          <!-- ② 用户管理 -->
+          <div class="admin-panel" data-admin-panel="users" hidden>
+            <div class="admin-bar">
+              <input type="search" id="adminSearch" placeholder="搜索用户名 / 手机号 / 邮箱 / 昵称" aria-label="搜索用户" />
+              <select id="adminStatusFilter" aria-label="按状态筛选">
+                <option value="">全部状态</option>
+                <option value="normal">正常</option>
+                <option value="disabled">已禁用</option>
+                <option value="banned">已封禁</option>
+                <option value="whitelist">白名单</option>
+              </select>
+              <button class="btn btn-secondary btn-sm" id="adminRefreshBtn" type="button">刷新</button>
+              <span class="spacer"></span>
+              <button class="btn btn-secondary btn-sm" id="adminExportBtn" type="button">⬇ 导出 CSV</button>
+            </div>
+            <div class="panel">
+              <div class="panel-title">👥 注册用户</div>
+              <div class="batch-bar" style="margin-bottom:10px;">
+                <button id="adminBatchDisable" type="button">批量禁用</button>
+                <button id="adminBatchEnable" type="button">批量启用</button>
+                <button id="adminBatchBan" class="danger" type="button">批量封禁</button>
+                <button id="adminBatchUnban" type="button">批量解封</button>
+                <button id="adminBatchWlOn" type="button">加入白名单</button>
+                <button id="adminBatchWlOff" type="button">移出白名单</button>
+              </div>
+              <div class="table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th class="check-cell"><input type="checkbox" id="adminUserSelAll" aria-label="全选" /></th>
+                      <th>ID</th>
+                      <th>昵称 / 头像</th>
+                      <th>登录标识</th>
+                      <th>角色</th>
+                      <th>状态</th>
+                      <th>白名单</th>
+                      <th>注册时间</th>
+                      <th>最后登录</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminUserBody"><tr><td colspan="10" class="empty-state" style="padding:24px;">加载中…</td></tr></tbody>
+                </table>
+              </div>
+              <div class="pager">
+                <button id="adminUserPrev" type="button">← 上一页</button>
+                <span class="pg-info" id="adminUserPageInfo">第 1 / 1 页</span>
+                <button id="adminUserNext" type="button">下一页 →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ③ 登录日志 -->
+          <div class="admin-panel" data-admin-panel="login-logs" hidden>
+            <div class="admin-bar">
+              <input type="search" id="loginLogSearch" placeholder="搜索登录名 / IP / 详情" aria-label="搜索登录日志" />
+              <select id="loginLogSuccess" aria-label="登录结果筛选">
+                <option value="">全部结果</option>
+                <option value="1">成功</option>
+                <option value="0">失败</option>
+              </select>
+              <button class="btn btn-secondary btn-sm" id="loginLogRefresh" type="button">刷新</button>
+            </div>
+            <div class="panel">
+              <div class="table-wrap">
+                <table class="admin-table">
+                  <thead><tr><th>ID</th><th>登录名</th><th>渠道</th><th>IP</th><th>结果</th><th>详情</th><th>时间</th></tr></thead>
+                  <tbody id="loginLogBody"><tr><td colspan="7" class="empty-state" style="padding:24px;">加载中…</td></tr></tbody>
+                </table>
+              </div>
+              <div class="pager">
+                <button id="loginLogPrev" type="button">← 上一页</button>
+                <span class="pg-info" id="loginLogPageInfo">第 1 / 1 页</span>
+                <button id="loginLogNext" type="button">下一页 →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ④ 审计日志 -->
+          <div class="admin-panel" data-admin-panel="audit-logs" hidden>
+            <div class="admin-bar">
+              <input type="search" id="auditLogSearch" placeholder="搜索管理员 / 操作 / 目标 / 详情" aria-label="搜索审计日志" />
+              <button class="btn btn-secondary btn-sm" id="auditLogRefresh" type="button">刷新</button>
+            </div>
+            <div class="panel">
+              <div class="table-wrap">
+                <table class="admin-table">
+                  <thead><tr><th>ID</th><th>管理员</th><th>操作</th><th>目标</th><th>详情</th><th>时间</th></tr></thead>
+                  <tbody id="auditLogBody"><tr><td colspan="6" class="empty-state" style="padding:24px;">加载中…</td></tr></tbody>
+                </table>
+              </div>
+              <div class="pager">
+                <button id="auditLogPrev" type="button">← 上一页</button>
+                <span class="pg-info" id="auditLogPageInfo">第 1 / 1 页</span>
+                <button id="auditLogNext" type="button">下一页 →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ⑤ 公告管理 -->
+          <div class="admin-panel" data-admin-panel="announcements" hidden>
+            <div class="admin-bar">
+              <button class="btn btn-primary btn-sm" id="announcementAddBtn" type="button">＋ 新增公告</button>
+              <button class="btn btn-secondary btn-sm" id="announcementRefreshBtn" type="button">刷新</button>
+            </div>
+            <div class="panel">
+              <div id="announcementList" style="display:flex;flex-direction:column;gap:10px;"></div>
+            </div>
+          </div>
+
+          <!-- ⑥ 敏感词 -->
+          <div class="admin-panel" data-admin-panel="words" hidden>
+            <div class="admin-bar">
+              <input type="text" id="wordInput" placeholder="输入敏感词，回车或点击添加" aria-label="新增敏感词" style="flex:1;min-width:220px;" />
+              <button class="btn btn-primary btn-sm" id="wordAddBtn" type="button">添加</button>
+              <button class="btn btn-secondary btn-sm" id="wordRefreshBtn" type="button">刷新</button>
+            </div>
+            <div class="panel">
+              <div id="wordList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+            </div>
+          </div>
+
+          <!-- ⑦ 系统设置 -->
+          <div class="admin-panel" data-admin-panel="settings" hidden>
+            <div class="settings-grid">
+              <div class="settings-card">
+                <div class="sc-title">⚙️ 基本设置</div>
+                <div class="setting-row">
+                  <div><div class="s-label">站点名称</div><div class="s-desc">显示在页面标题与各处</div></div>
+                  <input type="text" id="setSiteName" style="width:180px;" />
+                </div>
+              </div>
+              <div class="settings-card">
+                <div class="sc-title">🔐 登录与注册</div>
+                <div class="setting-row">
+                  <div><div class="s-label">开放注册</div><div class="s-desc">允许新用户注册账号</div></div>
+                  <label class="switch"><input type="checkbox" id="setRegisterEnabled" /><span class="slider"></span></label>
+                </div>
+                <div class="setting-row">
+                  <div><div class="s-label">开放登录</div><div class="s-desc">允许用户登录</div></div>
+                  <label class="switch"><input type="checkbox" id="setLoginEnabled" /><span class="slider"></span></label>
+                </div>
+                <div class="setting-row">
+                  <div><div class="s-label">公告展示</div><div class="s-desc">首页公告栏是否展示</div></div>
+                  <label class="switch"><input type="checkbox" id="setAnnouncementEnabled" /><span class="slider"></span></label>
+                </div>
+                <div class="setting-row">
+                  <div><div class="s-label">验证码要求</div><div class="s-desc">登录 / 注册是否要求验证码</div></div>
+                  <label class="switch"><input type="checkbox" id="setVerifyCodeRequired" /><span class="slider"></span></label>
+                </div>
+              </div>
+            </div>
+            <div class="admin-bar">
+              <button class="btn btn-primary" id="settingsSaveBtn" type="button">保存设置</button>
+              <span class="spacer"></span>
+              <span style="font-size:12px;color:var(--fg-muted);">修改后将实时生效并记录审计日志</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 用户详情弹窗 -->
+    <div class="modal-overlay" id="adminDetailOverlay">
+      <div class="modal">
+        <div class="modal-head">
+          <h3>👤 用户详情</h3>
+          <button class="modal-close" data-action="close-modal" aria-label="关闭">✕</button>
+        </div>
+        <div id="adminDetailContent"><div class="empty-state" style="padding:24px;">加载中…</div></div>
+      </div>
+    </div>
+
+    <!-- 公告编辑弹窗 -->
+    <div class="modal-overlay" id="announcementModal">
+      <div class="modal">
+        <div class="modal-head">
+          <h3 id="announcementModalTitle">新增公告</h3>
+          <button class="modal-close" data-action="close-modal" aria-label="关闭">✕</button>
+        </div>
+        <form id="announcementForm" style="display:flex;flex-direction:column;gap:12px;">
+          <input type="hidden" id="announcementId" />
+          <div>
+            <label style="font-size:13px;color:var(--fg-muted);">标题</label>
+            <input type="text" id="announcementTitle" placeholder="公告标题" required />
+          </div>
+          <div>
+            <label style="font-size:13px;color:var(--fg-muted);">内容</label>
+            <textarea id="announcementContent" rows="5" placeholder="公告内容" required></textarea>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px;">
+            <input type="checkbox" id="announcementPublished" checked /> 立即发布
+          </label>
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button class="btn btn-secondary" type="button" data-action="close-modal">取消</button>
+            <button class="btn btn-primary" type="submit">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- ═══════════ PAGE: CHAT ═══════════ -->
     <section class="page" id="page-chat" data-page="chat">
@@ -1837,14 +2224,17 @@ const Render = {
     const user = Data.getCurrentUser();
     const infoEl = $('#navUserInfo');
     const entryBtn = $('#authEntryBtn');
+    const adminNav = $('#adminNavLink');
     if (user) {
       $('#navUserAvatar').textContent = user.avatar || '🧑';
       $('#navUserNick').textContent = user.nick;
       infoEl.hidden = false;
       entryBtn.hidden = true;
+      adminNav.hidden = !(user.role === 'admin' || user.role === 'ADMIN');
     } else {
       infoEl.hidden = true;
       entryBtn.hidden = false;
+      adminNav.hidden = true;
     }
   },
   authPage() {
@@ -1997,7 +2387,7 @@ async function apiRequest(path, options = {}) {
   const res = await fetch(API_CONFIG.BASE_URL + path, { ...options, headers });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.message || ('请求失败：HTTP ' + res.status));
+    throw new Error(body.error || body.message || ('请求失败：HTTP ' + res.status));
   }
   return res.json();
 }
@@ -2061,7 +2451,9 @@ const Auth = {
       nick: u.nickname || u.username || u.phone || u.email || '玩家',
       avatar: u.avatar || '🧑',
       role: u.role || 'user',
-      id: u.id
+      id: u.id,
+      status: u.status || 'active',
+      whitelisted: !!u.whitelisted
     };
     Data.saveSession({ account: mapped.account, token: res.token, user: mapped });
     return mapped;
@@ -2074,6 +2466,83 @@ const Auth = {
     }
     // 真实后端无独立登出接口：直接清除本地会话
     Data.clearSession();
+  },
+
+  /* 发送手机号/邮箱验证码；DEV_MODE 下后端自动返回验证码 */
+  async sendCode(channel, target) {
+    return apiRequest('/api/auth/send-code', {
+      method: 'POST',
+      body: JSON.stringify({ channel, target })
+    });
+  },
+
+  /* 验证码登录（未注册自动注册） */
+  async loginByCode(channel, target, code) {
+    const res = await apiRequest('/api/auth/login-code', {
+      method: 'POST',
+      body: JSON.stringify({ channel, target, code })
+    });
+    return Auth._applySession(res);
+  },
+
+  /* 获取第三方登录授权地址并跳转（全部在网页完成） */
+  async oauthLogin(provider) {
+    const res = await apiRequest('/api/auth/oauth/' + encodeURIComponent(provider) + '/url');
+    if (!res.url) throw new Error('暂不支持该平台登录');
+    window.location.href = res.url;
+  },
+
+  /* 处理 OAuth 回调：URL 形如 #/oauth?token=xxx&provider=xxx */
+  handleOAuthToken() {
+    const hash = location.hash || '';
+    const m = hash.match(/^#\/oauth\?([\s\S]*)$/);
+    if (!m) return false;
+    const params = new URLSearchParams(m[1]);
+    const token = params.get('token');
+    if (!token) return false;
+    // 解析 payload 获取用户信息
+    let user = null;
+    try {
+      const payload = JSON.parse(decodeURIComponent(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) || '{}');
+      user = {
+        id: payload.sub,
+        account: payload.username || payload.phone || payload.email || '',
+        nick: payload.nickname || payload.username || payload.phone || payload.email || '玩家',
+        avatar: payload.avatar || '🧑',
+        role: payload.role || 'user'
+      };
+    } catch (e) { /* payload 解析失败时以 /me 兜底 */ }
+    Data.saveSession({ account: user ? user.account : '', token, user });
+    if (user) {
+      Auth.refreshMe(user);
+    }
+    location.hash = 'home';
+    return true;
+  },
+
+  /* 拉取 /api/auth/me 刷新当前用户信息（含状态、白名单） */
+  async refreshMe(fallback) {
+    try {
+      const res = await apiRequest('/api/auth/me');
+      const u = res.user || {};
+      const mapped = {
+        id: u.id,
+        account: u.username || u.phone || u.email || '',
+        nick: u.nickname || u.username || u.phone || u.email || '玩家',
+        avatar: u.avatar || '🧑',
+        role: u.role || 'user',
+        status: u.status || 'active',
+        whitelisted: !!u.whitelisted
+      };
+      const session = Data.getSession() || {};
+      Data.saveSession({ ...session, user: mapped });
+      return mapped;
+    } catch (e) {
+      if (fallback) {
+        Data.saveSession({ account: fallback.account, token: Data.getSession() ? Data.getSession().token : '', user: fallback });
+      }
+      return fallback || null;
+    }
   }
 };
 
@@ -2090,6 +2559,133 @@ function syncProfileFromUser(user) {
   const profile = Data.getProfile();
   Data.saveProfile({ ...profile, nick: user.nick, avatar: user.avatar });
   Data.upsertPlayer({ id: 'me', nick: user.nick, avatar: user.avatar, signature: profile.signature || '这个人很懒，什么都没写', playHours: profile.playHours || 0 });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   5.15 Admin 模块（管理后台：用户管理 / 黑白名单）
+════════════════════════════════════════════════════════════════ */
+const Admin = {
+  _users: [],
+  _lists: { banned: [], whitelisted: [] },
+
+  isAdmin() {
+    const user = Data.getCurrentUser();
+    return !!(user && (user.role === 'admin' || user.role === 'ADMIN'));
+  },
+
+  async loadUsers() {
+    const kw = $('#adminSearch').value.trim();
+    const status = $('#adminStatusFilter').value;
+    const qs = new URLSearchParams();
+    if (kw) qs.set('keyword', kw);
+    if (status) qs.set('status', status);
+    const res = await apiRequest('/api/auth/admin/users?' + qs.toString());
+    this._users = res.users || [];
+    Admin.renderStats(res.stats || {});
+    Admin.renderUsers();
+    try {
+      const lists = await apiRequest('/api/auth/admin/lists');
+      this._lists = {
+        banned: lists.blacklist || [],
+        whitelisted: lists.whitelist || []
+      };
+      Admin.renderLists();
+    } catch (e) { /* 名单加载失败不影响主列表 */ }
+  },
+
+  renderStats(stats) {
+    $('#statTotal').textContent = stats.total != null ? stats.total : '-';
+    $('#statActive').textContent = stats.active != null ? stats.active : '-';
+    $('#statDisabled').textContent = stats.disabled != null ? stats.disabled : '-';
+    $('#statBanned').textContent = stats.banned != null ? stats.banned : '-';
+    $('#statWhitelist').textContent = stats.whitelisted != null ? stats.whitelisted : '-';
+  },
+
+  renderUsers() {
+    const tbody = $('#adminUserBody');
+    if (!this._users.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-state" style="padding:24px;">没有匹配的用户</td></tr>';
+      return;
+    }
+    tbody.innerHTML = this._users.map(u => {
+      const ident = [u.username, u.phone, u.email].filter(Boolean).join(' / ') || '-';
+      const role = u.role === 'admin' || u.role === 'ADMIN' ? '管理员' : '普通用户';
+      const statusMap = {
+        normal: '<span class="badge badge-ok">正常</span>',
+        disabled: '<span class="badge badge-warn">已禁用</span>',
+        banned: '<span class="badge badge-danger">已封禁</span>'
+      };
+      const statusHtml = statusMap[u.status] || '<span class="badge badge-muted">未知</span>';
+      const whiteHtml = u.whitelisted ? '<span class="badge badge-ok">是</span>' : '<span class="badge badge-muted">否</span>';
+      const time = u.createdAt ? new Date(u.createdAt.replace(' ', 'T')).toLocaleString('zh-CN', { hour12: false }) : '-';
+      const isAdminSelf = role === '管理员';
+      let actions = '<span class="badge badge-muted">系统账号</span>';
+      if (!isAdminSelf) {
+        const btns = [];
+        if (u.status === 'normal' || !u.status) {
+          btns.push(`<button data-admin-op="disable" data-id="${u.id}">禁用登录</button>`);
+          btns.push(`<button data-admin-op="ban" data-id="${u.id}" class="danger">封禁</button>`);
+        } else if (u.status === 'disabled') {
+          btns.push(`<button data-admin-op="enable" data-id="${u.id}">恢复登录</button>`);
+        } else if (u.status === 'banned') {
+          btns.push(`<button data-admin-op="unban" data-id="${u.id}">解除封禁</button>`);
+        }
+        if (u.whitelisted) {
+          btns.push(`<button data-admin-op="whitelist-off" data-id="${u.id}" class="danger">移出白名单</button>`);
+        } else {
+          btns.push(`<button data-admin-op="whitelist-on" data-id="${u.id}">加入白名单</button>`);
+        }
+        actions = `<div class="admin-actions">${btns.join('')}</div>`;
+      }
+      return `<tr>
+        <td>${u.id}</td>
+        <td>${u.avatar || '🧑'} ${escapeHtml(u.nickname || u.username || '-')}</td>
+        <td>${escapeHtml(ident)}</td>
+        <td>${role}</td>
+        <td>${statusHtml}</td>
+        <td>${whiteHtml}</td>
+        <td>${time}</td>
+        <td>${actions}</td>
+      </tr>`;
+    }).join('');
+  },
+
+  renderLists() {
+    const banBox = $('#adminBanList');
+    const whiteBox = $('#adminWhiteList');
+    const identOf = (u) => [u.username, u.phone, u.email].filter(Boolean).join(' / ') || (u.nickname || '用户#' + u.id);
+    banBox.innerHTML = this._lists.banned.length
+      ? this._lists.banned.map(b => `<div class="admin-list-item"><span>${escapeHtml(identOf(b))}</span><span class="reason">${b.bannedReason ? '原因：' + escapeHtml(b.bannedReason) : '未填写原因'}</span></div>`).join('')
+      : '<div class="empty-state" style="padding:16px;">暂无</div>';
+    whiteBox.innerHTML = this._lists.whitelisted.length
+      ? this._lists.whitelisted.map(w => `<div class="admin-list-item"><span>${escapeHtml(identOf(w))}</span><span class="reason">白名单</span></div>`).join('')
+      : '<div class="empty-state" style="padding:16px;">暂无</div>';
+  },
+
+  async operate(action, userId) {
+    const actionMap = {
+      'disable': '禁用该用户登录',
+      'enable': '恢复该用户登录',
+      'ban': '封禁该用户（加入黑名单）',
+      'unban': '解除封禁（移出黑名单）',
+      'whitelist-on': '加入白名单（永久放行）',
+      'whitelist-off': '移出白名单'
+    };
+    const label = actionMap[action] || action;
+    if (!confirm(`确认执行「${label}」？`)) return;
+    const res = await apiRequest('/api/auth/admin/users/' + userId + '/' + action, {
+      method: 'POST',
+      body: JSON.stringify({})
+    });
+    toast(res.message || '操作成功');
+    await Admin.loadUsers();
+  }
+};
+
+function escapeHtml(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 function switchAuthTab(tab) {
@@ -2629,11 +3225,38 @@ function bindForms() {
       }
       else if (role === 'login-form') {
         e.preventDefault();
+        const loginMode = form.querySelector('.auth-sub-tab.active') ? form.querySelector('.auth-sub-tab.active').dataset.loginMode : 'pwd';
+        if (loginMode === 'code') {
+          const channelEl = form.querySelector('input[name="codeChannel"]:checked');
+          const channel = channelEl ? channelEl.value : 'phone';
+          const target = $('#loginCodeTarget').value.trim();
+          const code = $('#loginCode').value.trim();
+          if (!target) { toast('请输入手机号或邮箱'); return; }
+          if (channel === 'phone' && !/^1[3-9]\d{9}$/.test(target)) { toast('手机号格式不正确'); return; }
+          if (channel === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)) { toast('邮箱格式不正确'); return; }
+          if (!/^\d{4,6}$/.test(code)) { toast('请输入正确的验证码'); return; }
+          try {
+            const user = await Auth.loginByCode(channel, target, code);
+            await Auth.refreshMe(user);
+            syncProfileFromUser(user);
+            Render.navUser();
+            Render.myProfile();
+            Render.players();
+            Render.posts();
+            $('#postAsLabel').textContent = `发布为：${user.nick}`;
+            toast('登录成功，欢迎回来！');
+            navigate('home');
+          } catch (err) {
+            toast(err.message || '验证码登录失败');
+          }
+          return;
+        }
         const account = $('#loginAccount').value.trim();
         const password = $('#loginPassword').value;
         if (!account || !password) { toast('请输入账号和密码'); return; }
         try {
           const user = await Auth.login(account, password);
+          await Auth.refreshMe(user);
           syncProfileFromUser(user);
           Render.navUser();
           Render.myProfile();
@@ -2666,6 +3289,7 @@ function bindForms() {
         const color = colorPicked ? colorPicked.dataset.color : '#00d67d';
         try {
           const user = await Auth.register({ nick, account, phone, email, password, avatar, color });
+          await Auth.refreshMe(user);
           syncProfileFromUser(user);
           Render.navUser();
           Render.myProfile();
@@ -2745,6 +3369,81 @@ function bindGlobal() {
   });
   $$('[data-switch-auth]').forEach(btn => {
     btn.addEventListener('click', () => switchAuthTab(btn.dataset.switchAuth));
+  });
+  /* ── Auth：登录方式子 Tab（密码 / 验证码） ── */
+  $$('[data-login-mode]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.loginMode;
+      $$('[data-login-mode]').forEach(b => {
+        b.classList.toggle('active', b.dataset.loginMode === mode);
+        b.setAttribute('aria-selected', b.dataset.loginMode === mode ? 'true' : 'false');
+      });
+      $$('[data-login-mode-panel]').forEach(p => {
+        p.hidden = p.dataset.loginModePanel !== mode;
+      });
+    });
+  });
+  /* ── Auth：获取验证码（倒计时） ── */
+  $('#sendCodeBtn').addEventListener('click', async () => {
+    const channelEl = document.querySelector('input[name="codeChannel"]:checked');
+    const channel = channelEl ? channelEl.value : 'phone';
+    const target = $('#loginCodeTarget').value.trim();
+    if (!target) { toast('请先输入手机号或邮箱'); return; }
+    if (channel === 'phone' && !/^1[3-9]\d{9}$/.test(target)) { toast('手机号格式不正确'); return; }
+    if (channel === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)) { toast('邮箱格式不正确'); return; }
+    const btn = $('#sendCodeBtn');
+    btn.disabled = true;
+    try {
+      const res = await Auth.sendCode(channel, target);
+      const devCode = res.devCode || res.code || res.dev_code || (res.data && res.data.code);
+      if (devCode) {
+        toast(`验证码已发送（开发模式自动填充：${devCode}）`);
+        $('#loginCode').value = String(devCode);
+      } else {
+        toast('验证码已发送，请查收');
+      }
+    } catch (err) {
+      toast(err.message || '验证码发送失败');
+      btn.disabled = false;
+      return;
+    }
+    let sec = 60;
+    const timer = setInterval(() => {
+      sec -= 1;
+      if (sec <= 0) {
+        clearInterval(timer);
+        btn.disabled = false;
+        btn.textContent = '获取验证码';
+      } else {
+        btn.textContent = sec + 's 后重发';
+      }
+    }, 1000);
+  });
+  /* ── Auth：第三方品牌登录 ── */
+  $$('[data-oauth]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const provider = btn.dataset.oauth;
+      try {
+        await Auth.oauthLogin(provider);
+      } catch (err) {
+        toast(err.message || '暂不支持该平台登录');
+      }
+    });
+  });
+  /* ── Admin：管理后台 ── */
+  $('#adminSearch').addEventListener('input', () => Admin.loadUsers());
+  $('#adminStatusFilter').addEventListener('change', () => Admin.loadUsers());
+  $('#adminRefreshBtn').addEventListener('click', () => Admin.loadUsers());
+  document.addEventListener('click', async (e) => {
+    const opBtn = e.target.closest('[data-admin-op]');
+    if (!opBtn) return;
+    const action = opBtn.dataset.adminOp;
+    const userId = Number(opBtn.dataset.id);
+    try {
+      await Admin.operate(action, userId);
+    } catch (err) {
+      toast(err.message || '操作失败');
+    }
   });
   document.addEventListener('click', (e) => {
     const av = e.target.closest('[data-role="reg-avatar-row"] [data-avatar]');
@@ -2887,7 +3586,7 @@ function bindGlobal() {
 /* ════════════════════════════════════════════════════════════════
    6. 导航路由（hash）
 ════════════════════════════════════════════════════════════════ */
-const NAV_MAP = ['home', 'game', 'download', 'community', 'players', 'chat', 'auth'];
+const NAV_MAP = ['home', 'game', 'download', 'community', 'players', 'chat', 'auth', 'admin'];
 
 function navigate(name) {
   if (!NAV_MAP.includes(name)) name = 'home';
@@ -2910,9 +3609,32 @@ function navigate(name) {
     }
   }
   if (name === 'auth') Render.authPage();
+  if (name === 'admin') {
+    if (!Admin.isAdmin()) {
+      toast('仅管理员可访问管理后台');
+      navigate('home');
+      return;
+    }
+    Admin.loadUsers().catch(err => toast(err.message || '加载管理数据失败'));
+  }
 }
 
 function routeFromHash() {
+  // OAuth 回调：形如 #/oauth?token=xxx&provider=xxx
+  if (location.hash && location.hash.indexOf('#/oauth') === 0) {
+    const ok = Auth.handleOAuthToken();
+    if (ok) {
+      const user = Data.getCurrentUser();
+      syncProfileFromUser(user);
+      Render.navUser();
+      Render.myProfile();
+      Render.players();
+      Render.posts();
+      $('#postAsLabel').textContent = `发布为：${user ? user.nick : Data.getProfile().nick}`;
+      toast('第三方登录成功！');
+    }
+    return;
+  }
   const hash = location.hash.replace('#', '');
   navigate(NAV_MAP.includes(hash) ? hash : 'home');
 }
