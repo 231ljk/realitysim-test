@@ -62,8 +62,9 @@ ADMIN_USERNAME = _env('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = _env('ADMIN_PASSWORD', 'admin123456')
 ADMIN_NICKNAME = _env('ADMIN_NICKNAME', '管理员')
 
-# 开发模式：验证码直接随接口返回（生产环境务必关闭）
-DEV_MODE = _env('DEV_MODE', 'true').lower() != 'false'
+# 正式模式（DEV_MODE=false）：短信/邮件验证码需配置真实通道，登录/注册必须通过图形验证码
+# 开发模式（DEV_MODE=true）：验证码直接随接口返回，图形验证码可跳过（本地联调用）
+DEV_MODE = _env('DEV_MODE', 'false').lower() != 'false'
 
 # 短信/邮件验证码发送通道（未配置时仅开发模式可返回验证码）
 SMS_PROVIDER = _env('SMS_PROVIDER', '')

@@ -80,6 +80,20 @@ router = Blueprint('friends', __name__, url_prefix='/api')
 
 # ==================== 好友 ====================
 
+@router.get('/users')
+@auth_required
+def user_list():
+    """玩家广场：公开用户列表（不含敏感字段）"""
+    me = g.user['id']
+    rows = db.query("SELECT id, username, nickname, avatar, game_status FROM users WHERE status != 'banned' ORDER BY id DESC LIMIT 200")
+    out = []
+    for r in rows:
+        d = _fmt_user(r)
+        d['relationship'] = _relationship(me, r['id'])
+        out.append(d)
+    return jsonify({'users': out, 'total': len(out)})
+
+
 @router.get('/friends')
 @auth_required
 def friends_list():

@@ -27,7 +27,7 @@ def _now():
 
 
 def public_message(row):
-    sender = db.query_one('SELECT id, username, nickname, avatar FROM users WHERE id = ?', (row['sender_id'],))
+    sender = db.query_one('SELECT id, username, nickname, avatar, role FROM users WHERE id = ?', (row['sender_id'],))
     return {
         'id': row['id'],
         'conversationId': row['conversation_id'],
@@ -37,6 +37,7 @@ def public_message(row):
             'username': sender['username'] if sender else None,
             'nickname': sender['nickname'] if sender else '已注销用户',
             'avatar': sender['avatar'] if sender else '',
+            'role': sender['role'] if sender else 'user',
         },
         'type': row['type'],
         'content': row['content'],

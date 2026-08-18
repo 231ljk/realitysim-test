@@ -4,8 +4,11 @@
 管理员后台：用户管理（禁用/封禁/解封/白名单）、黑白名单
 接口与原 Node 版完全兼容。
 """
+import base64
 import hashlib
+import io
 import json
+import random
 import re
 import secrets
 import threading
@@ -17,6 +20,7 @@ from urllib import parse as urllib_parse
 
 import jwt as pyjwt
 from flask import Blueprint, g, jsonify, request
+from PIL import Image, ImageDraw, ImageFont
 
 from . import db
 from .config import (ADMIN_NICKNAME, ADMIN_PASSWORD, ADMIN_USERNAME, DEV_MODE,
@@ -100,6 +104,84 @@ def issue_token(user):
 # ---------- 验证码 ----------
 _code_store = {}
 _code_lock = threading.Lock()
+
+# ---------- 图形验证码（CAPTCHA，防AI自动注册/登录） ----------
+_captcha_store = {}
+_captcha_lock = threading.Lock()
+_CAPTCHA_TTL = 300  # 5 分钟过期
+_CAPTCHA_CHARS = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'
+
+
+def _captcha_text(length=4):
+    return ''.join(random.choice(_CAPTCHA_CHARS) for _ in range(length))
+
+
+def _captcha_image(text):
+    """用 Pillow 生成带干扰的图形验证码，返回 PNG base64（data URL）"""
+    width, height = 150, 52
+    img = Image.new('RGB', (width, height), (246, 248, 251))
+    draw = ImageDraw.Draw(img)
+    # 背景噪点
+    for _ in range(260):
+        draw.point((random.randint(0, width - 1), random.randint(0, height - 1)),
+                   fill=(random.randint(180, 235),) * 3)
+    # 干扰曲线/线段
+    for _ in range(6):
+        x1, y1 = random.randint(0, width), random.randint(0, height)
+        x2, y2 = random.randint(0, width), random.randint(0, height)
+        draw.line([(x1, y1), (x2, y2)], fill=(random.randint(160, 220),) * 3, width=1)
+    for _ in range(3):
+        x0, y0 = random.randint(20, width - 20), random.randint(10, height - 10)
+        draw.arc([x0 - 18, y0 - 18, x0 + 18, y0 + 18], 0, 360,
+                 fill=(random.randint(150, 210),) * 3, width=1)
+    # 字符（随机颜色 + 轻微旋转）
+    try:
+        font = ImageFont.truetype('C:/Windows/Fonts/arialbd.ttf', 30)
+    except Exception:
+        try:
+            font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 30)
+        except Exception:
+            font = ImageFont.load_default()
+    char_w = width // (len(text) + 1)
+    for i, ch in enumerate(text):
+        color = (random.randint(0, 90), random.randint(0, 90), random.randint(0, 90))
+        x = char_w // 2 + i * char_w + random.randint(-3, 3)
+        y = random.randint(4, 12)
+        draw.text((x, y), ch, font=font, fill=color)
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    return 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode('ascii')
+
+
+def create_captcha():
+    """创建图形验证码，返回 {captchaId, image}"""
+    text = _captcha_text()
+    cid = secrets.token_hex(16)
+    with _captcha_lock:
+        _captcha_store[cid] = {'text': text, 'createdAt': time.time()}
+    return {'captchaId': cid, 'image': _captcha_image(text)}
+
+
+def verify_captcha(captcha_id, captcha_code):
+    """校验图形验证码（一次性），通过返回 None，失败返回错误文案"""
+    if not captcha_id or not captcha_code:
+        return '请输入图形验证码'
+    with _captcha_lock:
+        rec = _captcha_store.pop(captcha_id, None)
+    if not rec:
+        return '图形验证码已失效，请刷新后重试'
+    if time.time() - rec['createdAt'] > _CAPTCHA_TTL:
+        return '图形验证码已过期，请刷新后重试'
+    if str(captcha_code).strip().upper() != rec['text']:
+        return '图形验证码错误，请重试'
+    return None
+
+
+def ensure_captcha(data):
+    """登录/注册统一校验图形验证码；DEV_MODE 下允许跳过（便于本地开发）"""
+    if DEV_MODE:
+        return None
+    return verify_captcha(data.get('captchaId'), data.get('captchaCode'))
 
 
 def send_verification_code(channel, target):
@@ -222,6 +304,9 @@ def register():
         return jsonify({'error': pw_err}), 400
     if not nickname:
         return jsonify({'error': '昵称不能为空'}), 400
+    captcha_err = ensure_captcha(data)
+    if captcha_err:
+        return jsonify({'error': captcha_err}), 400
 
     salt = secrets.token_hex(16)
     password_hash = hash_password(password, salt)
@@ -249,6 +334,9 @@ def login():
     password = data.get('password')
     if not login_name or not password:
         return jsonify({'error': '登录账号与密码不能为空'}), 400
+    captcha_err = ensure_captcha(data)
+    if captcha_err:
+        return jsonify({'error': captcha_err}), 400
     user = db.query_one('SELECT * FROM users WHERE username = ? OR phone = ? OR email = ?',
                         (login_name, login_name, login_name))
     status_err = check_user_status(user)
@@ -268,6 +356,12 @@ def login():
     log_login(user_id=user['id'], login_name=login_name, channel='pwd', req=request)
     token, pub = issue_token(user)
     return jsonify({'token': token, 'user': pub})
+
+
+# ---------- 图形验证码 ----------
+@router.get('/captcha')
+def get_captcha():
+    return jsonify(create_captcha())
 
 
 # ---------- 发送验证码 ----------
@@ -304,6 +398,9 @@ def login_code():
         return jsonify({'error': 'channel 仅支持 phone / email'}), 400
     if not target or not code:
         return jsonify({'error': '账号与验证码不能为空'}), 400
+    captcha_err = ensure_captcha(data)
+    if captcha_err:
+        return jsonify({'error': captcha_err}), 400
     rec = _code_store.get(f'{channel}:{target}')
     if not rec or rec['code'] != str(code):
         return jsonify({'error': '验证码错误或已过期'}), 401

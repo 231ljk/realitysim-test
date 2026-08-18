@@ -1,0 +1,31 @@
+# 环境与密钥（云端通过面板注入，不打进镜像）
+.env
+.env.local
+.env.example
+
+# 运行时数据（云端用 Turso，本地数据不打包）
+data/
+*.db
+*.sqlite
+uploads/
+
+# Python 缓存与虚拟环境
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# 本地启动脚本（云端用 gunicorn）
+start_backend.bat
+start_backend.vbs
+
+# 日志与测试产物
+*.log
+smoke_test.py
+ws_test*.py
+cleanup_test_data.py
+err*.txt
+out*.txt
+ws_*.txt
+.git/

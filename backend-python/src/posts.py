@@ -12,7 +12,7 @@ router = Blueprint('posts', __name__, url_prefix='/api/posts')
 
 def public_user(u):
     return {'id': u['id'], 'username': u['username'] or None,
-            'nickname': u['nickname'], 'avatar': u['avatar']}
+            'nickname': u['nickname'], 'avatar': u['avatar'], 'role': u['role'] if u else 'user'}
 
 
 def public_post(row, viewer_id=None):

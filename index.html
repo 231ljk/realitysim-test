@@ -762,6 +762,7 @@
     .chat-msg.mine .chat-bubble { background: var(--accent-soft); border-color: rgba(0, 214, 125, 0.3); border-radius: 12px 12px 4px 12px; }
     .chat-msg-meta { font-size: 10px; color: var(--muted); margin-top: 4px; text-align: right; font-family: var(--font-mono); }
     .chat-msg.mine .chat-msg-meta { text-align: left; }
+    .official-badge { display:inline-block; margin-left:4px; padding:0 5px; border-radius:6px; font-size:10px; line-height:16px; color:#fff; background:linear-gradient(135deg,#ff9f43,#ff6b6b); vertical-align:1px; }
     .chat-img {
       max-width: 220px; max-height: 220px; border-radius: 10px; display: block;
       cursor: zoom-in; border: 1px solid var(--border-soft);
@@ -837,6 +838,10 @@
     .code-input-row { display: flex; gap: 10px; }
     .code-input-row input { flex: 1; }
     .code-input-row .btn { flex-shrink: 0; }
+    .captcha-row { display: flex; gap: 10px; align-items: center; }
+    .captcha-row input { flex: 1; }
+    .captcha-img { flex-shrink: 0; width: 130px; height: 46px; border: 1px solid var(--border); border-radius: 10px; background: #f2f4f8; cursor: pointer; object-fit: cover; user-select: none; }
+    .captcha-img:hover { border-color: var(--accent); opacity: .9; }
     .oauth-divider { display: flex; align-items: center; gap: 14px; margin: 20px 0 14px; color: var(--fg-muted); font-size: 12px; }
     .oauth-divider::before, .oauth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-soft); }
     .oauth-row { display: flex; gap: 10px; justify-content: space-between; }
@@ -851,6 +856,11 @@
     /* ═══ 管理后台 ═══ */
     .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; }
     .admin-stat { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 18px 12px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 14px; }
+    .admin-stat-value { font-size: 26px; font-weight: 800; color: var(--fg); font-variant-numeric: tabular-nums; }
+    .admin-stat-value.stat-ok { color: #00d67d; }
+    .admin-stat-value.stat-warn { color: #ffa502; }
+    .admin-stat-value.stat-danger { color: #ff4757; }
+    .admin-stat-label { font-size: 13px; color: var(--fg-muted); }
     .as-num { font-size: 26px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
     .as-label { font-size: 13px; color: var(--fg-muted); }
     .admin-filter { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -1139,8 +1149,8 @@
             <h2>与千万玩家一起分享人生</h2>
           </div>
           <div class="row-between" style="margin-bottom: var(--gap-md);">
-            <span class="meta">社区 = 发帖交流 + 实时聊天，登录后即可参与</span>
-            <button class="btn btn-secondary" data-nav="chat">💬 进入聊天室 →</button>
+            <span class="meta">社区 = 发帖交流 + 实时聊天 + 好友互动，登录后即可参与</span>
+            <span class="meta">💬 聊天室已嵌入本页</span>
           </div>
           <div class="community-layout">
             <div>
@@ -1171,6 +1181,49 @@
               <div class="panel-title">📢 官方公告</div>
               <div id="announceList"></div>
             </aside>
+            <aside class="panel" aria-label="好友面板" style="margin-top: var(--gap-lg);">
+              <div class="panel-title">👥 我的好友 <span class="meta" id="friendCount"></span></div>
+              <div id="friendRequestList" aria-live="polite" style="margin-bottom:10px;"></div>
+              <div id="friendList" aria-live="polite"></div>
+              <button class="btn btn-ghost btn-sm" style="width:100%; margin-top:10px;" data-action="refresh-friends">🔄 刷新好友</button>
+            </aside>
+          </div>
+
+          <!-- 社区内嵌聊天室 -->
+          <div class="panel" style="margin-top: var(--gap-lg);">
+            <div class="panel-title">💬 社区聊天室 <span class="meta">官方与玩家实时交流</span></div>
+            <div class="chat-locked" id="chatLockedBar" hidden>
+              <span aria-hidden="true">🔒</span>
+              <span>您还未登录，当前只能查看会话，登录后才能发送消息。<button class="auth-link" data-nav="auth">去登录 →</button></span>
+            </div>
+            <div class="chat-layout" id="chatLayout">
+              <!-- 会话列表 -->
+              <aside class="chat-sidebar" id="chatSidebar" aria-label="会话列表">
+                <div class="chat-sidebar-head">
+                  <div class="panel-title" style="margin-bottom:10px;">💬 消息</div>
+                  <div class="chat-search">
+                    <input type="search" id="convSearch" placeholder="搜索会话…" aria-label="搜索会话" />
+                  </div>
+                </div>
+                <div class="conv-list" id="convList" aria-live="polite"></div>
+              </aside>
+              <!-- 聊天窗口 -->
+              <div class="chat-main" id="chatMain">
+                <div class="chat-main-head">
+                  <div>
+                    <div class="chat-title" id="chatTitle">选择会话</div>
+                    <div class="chat-status" id="chatStatus"></div>
+                  </div>
+                </div>
+                <div class="chat-msgs" id="chatMsgs"></div>
+                <div class="chat-input-bar" id="chatInputBar">
+                  <button class="chat-tool-btn" id="chatImgBtn" type="button" title="发送图片" aria-label="发送图片">🖼️</button>
+                  <textarea class="chat-input" id="chatTextInput" rows="1" placeholder="输入消息…" aria-label="输入消息"></textarea>
+                  <button class="chat-record-btn" id="chatRecordBtn" type="button">🎤 按住说话</button>
+                  <input type="file" id="chatImgFile" accept="image/*" hidden />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1245,6 +1298,13 @@
                     <label for="loginPassword">密码</label>
                     <input type="password" id="loginPassword" maxlength="64" placeholder="请输入密码" autocomplete="current-password" required />
                   </div>
+                  <div class="field">
+                    <label for="loginCaptcha">图形验证码</label>
+                    <div class="captcha-row">
+                      <input type="text" id="loginCaptcha" maxlength="6" placeholder="输入图中字符（不区分大小写）" autocomplete="off" required />
+                      <img class="captcha-img" id="loginCaptchaImg" alt="图形验证码，点击刷新" title="看不清？点击刷新" />
+                    </div>
+                  </div>
                   <button type="submit" class="btn btn-primary" style="width:100%;">登 录</button>
                   <p class="meta" style="margin-top:10px;text-align:center;">支持用户名、手机号、邮箱任一方式登录</p>
                 </div>
@@ -1268,6 +1328,13 @@
                   <div class="field">
                     <label for="loginCode">验证码</label>
                     <input type="text" id="loginCode" maxlength="6" placeholder="6 位验证码" inputmode="numeric" autocomplete="one-time-code" />
+                  </div>
+                  <div class="field">
+                    <label for="loginCodeCaptcha">图形验证码</label>
+                    <div class="captcha-row">
+                      <input type="text" id="loginCodeCaptcha" maxlength="6" placeholder="输入图中字符（不区分大小写）" autocomplete="off" />
+                      <img class="captcha-img" id="loginCodeCaptchaImg" alt="图形验证码，点击刷新" title="看不清？点击刷新" />
+                    </div>
                   </div>
                   <button type="submit" class="btn btn-primary" style="width:100%;">登录 / 注册</button>
                   <p class="meta" style="margin-top:10px;text-align:center;">未注册的手机号 / 邮箱验证通过后将自动注册</p>
@@ -1309,6 +1376,13 @@
                 <div class="field">
                   <label for="regConfirm">确认密码</label>
                   <input type="password" id="regConfirm" maxlength="64" placeholder="再次输入密码" autocomplete="new-password" required />
+                </div>
+                <div class="field">
+                  <label for="regCaptcha">图形验证码</label>
+                  <div class="captcha-row">
+                    <input type="text" id="regCaptcha" maxlength="6" placeholder="输入图中字符（不区分大小写）" autocomplete="off" required />
+                    <img class="captcha-img" id="regCaptchaImg" alt="图形验证码，点击刷新" title="看不清？点击刷新" />
+                  </div>
                 </div>
                 <div class="field">
                   <label>选择头像</label>
@@ -1591,49 +1665,14 @@
     </div>
 
     <!-- ═══════════ PAGE: CHAT ═══════════ -->
-    <section class="page" id="page-chat" data-page="chat">
+    <!-- ═══════════ PAGE: CHAT（已合并进社区页，此处移除独立页面） ═══════════ -->
+    <section class="page" id="page-chat" data-page="chat" hidden>
       <div class="section" style="padding-block: clamp(30px, 5vw, 56px);">
         <div class="container">
           <div class="section-head">
             <p class="eyebrow">CHAT · 实时聊天室</p>
-            <h2>和玩家们聊聊人生</h2>
-            <p class="lead">支持文字、图片、语音消息，会话列表一键切换。登录后即可加入聊天。</p>
-          </div>
-
-          <div class="chat-locked" id="chatLockedBar" hidden>
-            <span aria-hidden="true">🔒</span>
-            <span>您还未登录，当前只能查看会话，登录后才能发送消息。<button class="auth-link" data-nav="auth">去登录 →</button></span>
-          </div>
-
-          <div class="chat-layout" id="chatLayout">
-            <!-- 会话列表 -->
-            <aside class="chat-sidebar" id="chatSidebar" aria-label="会话列表">
-              <div class="chat-sidebar-head">
-                <div class="panel-title" style="margin-bottom:10px;">💬 消息</div>
-                <div class="chat-search">
-                  <input type="search" id="convSearch" placeholder="搜索会话…" aria-label="搜索会话" />
-                </div>
-              </div>
-              <div class="conv-list" id="convList" aria-live="polite"></div>
-            </aside>
-
-            <!-- 聊天窗口 -->
-            <div class="chat-main" id="chatMain">
-              <div class="chat-main-head">
-                <button class="btn btn-secondary btn-sm chat-back-btn" id="chatBackBtn" type="button">← 返回</button>
-                <div>
-                  <div class="chat-title" id="chatTitle">选择会话</div>
-                  <div class="chat-status" id="chatStatus"></div>
-                </div>
-              </div>
-              <div class="chat-msgs" id="chatMsgs"></div>
-              <div class="chat-input-bar" id="chatInputBar">
-                <button class="chat-tool-btn" id="chatImgBtn" type="button" title="发送图片" aria-label="发送图片">🖼️</button>
-                <textarea class="chat-input" id="chatTextInput" rows="1" placeholder="输入消息…" aria-label="输入消息"></textarea>
-                <button class="chat-record-btn" id="chatRecordBtn" type="button">🎤 按住说话</button>
-                <input type="file" id="chatImgFile" accept="image/*" hidden />
-              </div>
-            </div>
+            <h2>聊天室已合并至社区</h2>
+            <p class="lead">请前往「社区」页面参与实时聊天。</p>
           </div>
         </div>
       </div>
@@ -1981,8 +2020,9 @@ const Data = {
     return users.find(u => u.account === s.account) || null;
   },
 
-  /* ── Chat（聊天室，本地模拟 + 后端预留） ── */
+  /* ── Chat（聊天室；真实后端 useMock=false 时由 Chat 模块缓存，此处兜底本地模拟） ── */
   getChatConvs() {
+    if (!API_CONFIG.useMock && window.ChatCache) return window.ChatCache.convs;
     const convs = Store.load(Store.KEY.chatConvs, null);
     if (!convs) {
       const now = Date.now();
@@ -1992,13 +2032,20 @@ const Data = {
     }
     return convs;
   },
-  saveChatConvs(convs) { Store.save(Store.KEY.chatConvs, convs); },
+  saveChatConvs(convs) {
+    if (!API_CONFIG.useMock && window.ChatCache) { window.ChatCache.convs = convs; return; }
+    Store.save(Store.KEY.chatConvs, convs);
+  },
   getChatMsgs() {
+    if (!API_CONFIG.useMock && window.ChatCache) return window.ChatCache.msgs;
     const msgs = Store.load(Store.KEY.chatMsgs, null);
     if (!msgs) { Store.save(Store.KEY.chatMsgs, SEED_CHAT_MSGS); return SEED_CHAT_MSGS; }
     return msgs;
   },
-  saveChatMsgs(msgs) { Store.save(Store.KEY.chatMsgs, msgs); }
+  saveChatMsgs(msgs) {
+    if (!API_CONFIG.useMock && window.ChatCache) { window.ChatCache.msgs = msgs; return; }
+    Store.save(Store.KEY.chatMsgs, msgs);
+  }
 };
 
 /* ════════════════════════════════════════════════════════════════
@@ -2119,26 +2166,69 @@ const Render = {
     const top = ANNOUNCEMENTS[0];
     $('#homeAnnounce').textContent = top ? `${top.title} — ${top.text}` : '';
   },
+  friendPanel() {
+    const user = Data.getCurrentUser();
+    const el = $('#friendList');
+    if (!el) return;
+    if (!user) {
+      $('#friendCount').textContent = '登录后可查看';
+      $('#friendList').innerHTML = `<div class="empty-state"><div class="es-icon">🔒</div>登录后查看好友</div>`;
+      $('#friendRequestList').innerHTML = '';
+      return;
+    }
+    const { list, requests } = Friends.cache;
+    $('#friendCount').textContent = `共 ${list.length} 位`;
+    const pending = requests.filter(r => r && r.status === 'pending');
+    $('#friendRequestList').innerHTML = pending.length ? `
+      <div class="panel-title" style="font-size:12px; margin-bottom:6px;">📨 好友申请（${pending.length}）</div>
+      ${pending.map(r => {
+        const u = r.from || {};
+        return `<div class="friend-req" style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--border-soft);">
+          <span class="avatar" aria-hidden="true" style="width:26px;height:26px;font-size:14px;">${u.avatar || '🧑'}</span>
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(u.nickname || u.username || '玩家')}</div>
+            <div style="font-size:10px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(r.message || '想加你为好友')}</div>
+          </div>
+          <button class="btn btn-primary btn-sm" data-action="accept-friend" data-req-id="${r.id}">接受</button>
+          <button class="btn btn-ghost btn-sm" data-action="reject-friend" data-req-id="${r.id}">拒绝</button>
+        </div>`;
+      }).join('')}` : '';
+    $('#friendList').innerHTML = list.length ? list.map(f => {
+      const uid = f.id;
+      const name = f.nickname || f.username || '玩家';
+      const avatar = f.avatar || '🧑';
+      const official = f.role === 'admin' || f.role === 'ADMIN';
+      return `<div class="friend-item" style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--border-soft);">
+        <span class="avatar" aria-hidden="true" style="width:26px;height:26px;font-size:14px;">${avatar}</span>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(name)}${official ? ' <span class="official-badge">官方</span>' : ''}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" data-action="chat-friend" data-uid="${uid}" data-nick="${escapeHtml(name)}" data-avatar="${escapeHtml(avatar)}">💬 私聊</button>
+      </div>`;
+    }).join('') : `<div class="empty-state"><div class="es-icon">👥</div>暂无好友，去玩家广场逛逛吧</div>`;
+  },
   posts() {
-    const posts = Data.getPosts();
+    const posts = API_CONFIG.useMock ? Data.getPosts() : (window.ServerPosts || []);
     const follows = Data.getFollows();
     const myProfile = Data.getProfile();
     const sorted = [...posts].sort((a, b) => b.time - a.time);
     $('#postCount').textContent = `共 ${posts.length} 篇`;
     if (!posts.length) {
-      $('#postList').innerHTML = `<div class="empty-state"><div class="es-icon">🗒️</div>还没有帖子，来发第一帖吧！</div>`;
+      $('#postList').innerHTML = `<div class="empty-state"><div class="es-icon">🗒️</div>${API_CONFIG.useMock ? '还没有帖子，来发第一帖吧！' : '正在加载帖子…'}</div>`;
+      if (!API_CONFIG.useMock) loadServerPosts();
       return;
     }
     $('#postList').innerHTML = sorted.map(p => {
-      const commentCount = (p.comments || []).length;
+      const commentCount = p.commentCount != null ? p.commentCount : (p.comments || []).length;
       const liked = (p.likes || []).includes(myProfile.nick);
       const isMine = p.author === myProfile.nick;
+      const official = !API_CONFIG.useMock ? (p.authorRole === 'admin' || p.authorRole === 'ADMIN') : p.author === '官方';
       return `
       <article class="post-card" data-post-id="${p.id}">
         <div class="post-head">
           <span class="avatar" aria-hidden="true">${p.avatar || '🧑'}</span>
           <div>
-            <div class="post-author">${escapeHtml(p.author)}</div>
+            <div class="post-author">${escapeHtml(p.author)}${official ? ' <span class="official-badge">官方</span>' : ''}</div>
             <div class="post-time">${fmtTime(p.time)}</div>
           </div>
         </div>
@@ -2146,7 +2236,7 @@ const Render = {
         <p class="post-excerpt">${escapeHtml(p.content.slice(0, 120))}${p.content.length > 120 ? '…' : ''}</p>
         <div class="post-foot">
           <button class="action-btn${liked ? ' liked' : ''}" data-action="like-post" data-post-id="${p.id}" aria-label="点赞">
-            <span aria-hidden="true">👍</span> <span data-role="like-count">${(p.likes || []).length}</span>
+            <span aria-hidden="true">👍</span> <span data-role="like-count">${liked ? (p.likeCount || 1) : (p.likeCount || 0)}</span>
           </button>
           <button class="action-btn" data-action="open-post" data-post-id="${p.id}" aria-label="评论">
             <span aria-hidden="true">💬</span> <span>${commentCount}</span>
@@ -2158,34 +2248,42 @@ const Render = {
     }).join('');
   },
   players() {
-    const players = Data.getPlayers();
+    const players = API_CONFIG.useMock ? Data.getPlayers() : (window.ServerPlayers || []);
     const follows = Data.getFollows();
     const myProfile = Data.getProfile();
     const kw = $('#playerSearch').value.trim().toLowerCase();
-    const filtered = players.filter(p => !kw || p.nick.toLowerCase().includes(kw) || (p.signature || '').toLowerCase().includes(kw));
-    const sorted = [...filtered].sort((a, b) => b.playHours - a.playHours);
+    const filtered = players.filter(p => !kw || (p.nick || '').toLowerCase().includes(kw) || (p.signature || '').toLowerCase().includes(kw) || (p.nickname || '').toLowerCase().includes(kw));
+    const sorted = [...filtered].sort((a, b) => (b.playHours || 0) - (a.playHours || 0));
     $('#playerCount').textContent = `共 ${players.length} 位玩家`;
     if (!sorted.length) {
-      $('#playerList').innerHTML = `<div class="empty-state"><div class="es-icon">🔍</div>没有找到匹配的玩家</div>`;
+      $('#playerList').innerHTML = `<div class="empty-state"><div class="es-icon">🔍</div>${API_CONFIG.useMock ? '没有找到匹配的玩家' : '正在加载玩家…'}</div>`;
+      if (!API_CONFIG.useMock) loadServerPlayers();
       return;
     }
     $('#playerList').innerHTML = sorted.map(p => {
-      const isMe = p.id === 'me';
-      const followed = follows.includes(p.id);
+      const pid = p.id;
+      const isMe = !API_CONFIG.useMock ? String(pid) === String((Data.getCurrentUser() || {}).id) : pid === 'me';
+      const followed = follows.includes(pid);
+      const nick = p.nick || p.nickname || '玩家';
+      const avatar = p.avatar || '🧑';
+      const signature = p.signature || '这个人很懒，什么都没写';
+      const hours = p.playHours || 0;
+      const relationship = p.relationship || 'none';
       return `
       <div class="player-card">
-        <span class="avatar" aria-hidden="true">${p.avatar || '🧑'}</span>
+        <span class="avatar" aria-hidden="true">${avatar}</span>
         <div class="pc-info">
-          <div class="pc-name">${escapeHtml(p.nick)}${isMe ? ' <span class="badge badge-accent">我</span>' : ''}</div>
-          <div class="pc-sign">${escapeHtml(p.signature || '这个人很懒，什么都没写')}</div>
-          <div class="pc-hours">🕹️ ${p.playHours} 小时</div>
+          <div class="pc-name">${escapeHtml(nick)}${isMe ? ' <span class="badge badge-accent">我</span>' : ''}${relationship === 'friend' ? ' <span class="official-badge">好友</span>' : ''}${relationship === 'outgoing' ? ' <span class="badge">待通过</span>' : ''}${relationship === 'incoming' ? ' <span class="badge">待处理</span>' : ''}</div>
+          <div class="pc-sign">${escapeHtml(signature)}</div>
+          <div class="pc-hours">🕹️ ${hours} 小时</div>
         </div>
         <div style="display:flex; flex-direction:column; gap:6px; flex:none;">
           ${isMe ? `<button class="btn btn-ghost btn-sm" data-action="edit-profile">编辑资料</button>`
-                 : `<button class="btn btn-sm ${followed ? 'btn-secondary' : 'btn-primary'}" data-action="toggle-follow" data-player-id="${p.id}">
+                 : `<button class="btn btn-sm ${followed ? 'btn-secondary' : 'btn-primary'}" data-action="toggle-follow" data-player-id="${pid}">
                       ${followed ? '✓ 已关注' : '+ 关注'}
                     </button>
-                    <button class="btn btn-ghost btn-sm" data-action="open-msg" data-player-id="${p.id}" data-player-nick="${escapeHtml(p.nick)}" data-player-avatar="${escapeHtml(p.avatar || '🧑')}">✉️ 私信</button>`}
+                    ${!API_CONFIG.useMock && relationship !== 'friend' && relationship !== 'outgoing' && relationship !== 'incoming' ? `<button class="btn btn-ghost btn-sm" data-action="add-friend" data-player-id="${pid}" data-player-nick="${escapeHtml(nick)}">🤝 加好友</button>` : ''}
+                    <button class="btn btn-ghost btn-sm" data-action="open-msg" data-player-id="${pid}" data-player-nick="${escapeHtml(nick)}" data-player-avatar="${escapeHtml(avatar)}">✉️ 私信</button>`}
         </div>
       </div>`;
     }).join('');
@@ -2335,12 +2433,13 @@ const Render = {
         }
         const mine = m.from === 'me' || (me && (m.from === me.nick));
         const side = mine ? 'mine' : '';
+        const official = !mine && (m.fromRole === 'admin' || m.fromRole === 'ADMIN');
         html += `
           <div class="chat-msg ${side}">
             <span class="avatar" aria-hidden="true">${m.avatar || (mine ? (me ? me.avatar : '🧑') : (conv.avatar || '🧑'))}</span>
             <div style="min-width:0; display:flex; flex-direction:column;">
               <div class="chat-bubble">${renderChatContent(m)}</div>
-              <div class="chat-msg-meta">${fmtChatTime(m.time)}${mine ? '' : ' · ' + escapeHtml(m.from)}</div>
+              <div class="chat-msg-meta">${fmtChatTime(m.time)}${mine ? '' : ' · ' + escapeHtml(m.from) + (official ? ' <span class="official-badge">官方</span>' : '')}</div>
             </div>
           </div>`;
       });
@@ -2401,7 +2500,25 @@ let currentPlatform = PLATFORMS[0];
    5.1 Auth 模块（登录 / 注册 / 登出）
 ════════════════════════════════════════════════════════════════ */
 const Auth = {
-  async register({ nick, account, phone, email, password, avatar, color }) {
+  /* 图形验证码状态：{captchaId, image} */
+  captcha: { captchaId: '', image: '' },
+
+  async loadCaptcha() {
+    if (API_CONFIG.useMock) return;
+    try {
+      const res = await apiRequest('/api/auth/captcha');
+      Auth.captcha = { captchaId: res.captchaId, image: res.image };
+      $$('.captcha-img').forEach(img => { img.src = Auth.captcha.image; });
+    } catch (e) {
+      $$('.captcha-img').forEach(img => { img.src = ''; });
+    }
+  },
+
+  captchaPayload() {
+    return { captchaId: Auth.captcha.captchaId, captchaCode: '' };
+  },
+
+  async register({ nick, account, phone, email, password, avatar, color, captchaId, captchaCode }) {
     if (API_CONFIG.useMock) {
       const users = Data.getUsers();
       if (users.some(u => u.account === account)) {
@@ -2421,13 +2538,15 @@ const Auth = {
         email: email || null,
         password,
         nickname: nick,
-        avatar: avatar || '🧑'
+        avatar: avatar || '🧑',
+        captchaId,
+        captchaCode
       })
     });
     return Auth._applySession(res);
   },
 
-  async login(account, password) {
+  async login(account, password, captchaId, captchaCode) {
     if (API_CONFIG.useMock) {
       const users = Data.getUsers();
       const user = users.find(u => u.account === account && u.password === password);
@@ -2438,7 +2557,7 @@ const Auth = {
     // 真实后端：POST {BASE_URL}/api/auth/login（login 字段支持用户名/手机号/邮箱）
     const res = await apiRequest('/api/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ login: account, password })
+      body: JSON.stringify({ login: account, password, captchaId, captchaCode })
     });
     return Auth._applySession(res);
   },
@@ -2477,10 +2596,10 @@ const Auth = {
   },
 
   /* 验证码登录（未注册自动注册） */
-  async loginByCode(channel, target, code) {
+  async loginByCode(channel, target, code, captchaId, captchaCode) {
     const res = await apiRequest('/api/auth/login-code', {
       method: 'POST',
-      body: JSON.stringify({ channel, target, code })
+      body: JSON.stringify({ channel, target, code, captchaId, captchaCode })
     });
     return Auth._applySession(res);
   },
@@ -2594,17 +2713,37 @@ const Admin = {
   },
 
   renderStats(stats) {
-    $('#statTotal').textContent = stats.total != null ? stats.total : '-';
-    $('#statActive').textContent = stats.active != null ? stats.active : '-';
-    $('#statDisabled').textContent = stats.disabled != null ? stats.disabled : '-';
-    $('#statBanned').textContent = stats.banned != null ? stats.banned : '-';
-    $('#statWhitelist').textContent = stats.whitelisted != null ? stats.whitelisted : '-';
+    // 后端 stats: {total, normal, disabled, banned, whitelist, admins, ...}
+    const cards = [
+      { label: '总用户', value: stats.total, cls: '' },
+      { label: '正常', value: stats.normal, cls: 'ok' },
+      { label: '已禁用', value: stats.disabled, cls: 'warn' },
+      { label: '已封禁', value: stats.banned, cls: 'danger' },
+      { label: '白名单', value: stats.whitelist != null ? stats.whitelist : stats.whitelisted, cls: 'ok' }
+    ];
+    const box = $('#dashUserStats');
+    if (box) {
+      box.innerHTML = cards.map(c => `
+        <div class="admin-stat">
+          <span class="admin-stat-value ${c.cls ? 'stat-' + c.cls : ''}">${c.value != null ? c.value : '-'}</span>
+          <span class="admin-stat-label">${c.label}</span>
+        </div>`).join('');
+    }
+    // 实时数据补充（管理员数等）
+    const extras = $('#dashExtras');
+    if (extras) {
+      const chips = [];
+      if (stats.admins != null) chips.push(`<span class="badge badge-muted">管理员 ${stats.admins}</span>`);
+      if (stats.today != null) chips.push(`<span class="badge badge-muted">今日注册 ${stats.today}</span>`);
+      if (stats.online != null) chips.push(`<span class="badge badge-muted">在线 ${stats.online}</span>`);
+      extras.innerHTML = chips.join('') || '<span class="badge badge-muted">暂无更多指标</span>';
+    }
   },
 
   renderUsers() {
     const tbody = $('#adminUserBody');
     if (!this._users.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="empty-state" style="padding:24px;">没有匹配的用户</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="empty-state" style="padding:24px;">没有匹配的用户</td></tr>';
       return;
     }
     tbody.innerHTML = this._users.map(u => {
@@ -2618,6 +2757,7 @@ const Admin = {
       const statusHtml = statusMap[u.status] || '<span class="badge badge-muted">未知</span>';
       const whiteHtml = u.whitelisted ? '<span class="badge badge-ok">是</span>' : '<span class="badge badge-muted">否</span>';
       const time = u.createdAt ? new Date(u.createdAt.replace(' ', 'T')).toLocaleString('zh-CN', { hour12: false }) : '-';
+      const lastLogin = u.lastLoginAt ? new Date(u.lastLoginAt.replace(' ', 'T')).toLocaleString('zh-CN', { hour12: false }) : '-';
       const isAdminSelf = role === '管理员';
       let actions = '<span class="badge badge-muted">系统账号</span>';
       if (!isAdminSelf) {
@@ -2638,6 +2778,7 @@ const Admin = {
         actions = `<div class="admin-actions">${btns.join('')}</div>`;
       }
       return `<tr>
+        <td class="check-cell"><input type="checkbox" class="admin-user-check" data-id="${u.id}" aria-label="选择用户 ${u.id}" /></td>
         <td>${u.id}</td>
         <td>${u.avatar || '🧑'} ${escapeHtml(u.nickname || u.username || '-')}</td>
         <td>${escapeHtml(ident)}</td>
@@ -2645,6 +2786,7 @@ const Admin = {
         <td>${statusHtml}</td>
         <td>${whiteHtml}</td>
         <td>${time}</td>
+        <td>${lastLogin}</td>
         <td>${actions}</td>
       </tr>`;
     }).join('');
@@ -2693,14 +2835,197 @@ function switchAuthTab(tab) {
   $$('.auth-form').forEach(f => f.classList.toggle('active', f.id === (tab === 'login' ? 'loginForm' : 'registerForm')));
 }
 
+/* 玩家广场：真实后端加载公开用户列表 */
+async function loadServerPlayers() {
+  if (API_CONFIG.useMock || !Data.getCurrentUser()) return;
+  try {
+    const res = await apiRequest('/api/users');
+    window.ServerPlayers = res.users || [];
+    Render.players();
+  } catch (e) {
+    window.ServerPlayers = [];
+    Render.players();
+  }
+}
+
+/* 帖子：真实后端加载列表 */
+function normalizeServerPost(p) {
+  const author = p.author || {};
+  const t = new Date((p.createdAt || '').replace(/-/g, '/'));
+  return {
+    id: p.id,
+    author: author.nickname || '玩家',
+    avatar: author.avatar || '🧑',
+    authorRole: author.role,
+    time: isNaN(t.getTime()) ? Date.now() : t.getTime(),
+    title: p.title,
+    content: p.content,
+    images: p.images || [],
+    likes: p.liked ? [Data.getCurrentUser()?.nick || '我'] : [],
+    likeCount: p.likeCount || 0,
+    commentCount: p.commentCount || 0,
+    comments: []
+  };
+}
+async function loadServerPosts() {
+  if (API_CONFIG.useMock) return;
+  try {
+    const res = await apiRequest('/api/posts');
+    window.ServerPosts = (res.posts || []).map(normalizeServerPost);
+    Render.posts();
+  } catch (e) {
+    window.ServerPosts = [];
+    Render.posts();
+  }
+}
+async function loadServerPostDetail(pid) {
+  const res = await apiRequest('/api/posts/' + pid);
+  const p = normalizeServerPost(res.post);
+  p.comments = (res.comments || []).map(c => ({
+    author: (c.author || {}).nickname || '玩家',
+    avatar: (c.author || {}).avatar || '🧑',
+    content: c.content,
+    time: new Date((c.createdAt || '').replace(/-/g, '/')).getTime()
+  }));
+  return p;
+}
+
 /* ════════════════════════════════════════════════════════════════
-   5.2 Chat 模块（聊天室：本地模拟 + WebSocket 预留）
+   5.2 Friends 模块（好友申请 / 好友列表 / 好友私聊入口）
+════════════════════════════════════════════════════════════════ */
+const Friends = {
+  cache: { list: [], requests: [] },
+
+  async loadAll() {
+    if (!Data.getCurrentUser()) {
+      Friends.cache = { list: [], requests: [] };
+      Render.friendPanel();
+      return;
+    }
+    if (API_CONFIG.useMock) {
+      Friends.cache = { list: [], requests: [] };
+      Render.friendPanel();
+      return;
+    }
+    try {
+      const [l, r] = await Promise.all([
+        apiRequest('/api/friends'),
+        apiRequest('/api/friends/requests')
+      ]);
+      Friends.cache = { list: l.friends || [], requests: r.requests || [] };
+    } catch (e) {
+      Friends.cache = { list: [], requests: [] };
+    }
+    Render.friendPanel();
+  },
+
+  async sendRequest(userId, nick) {
+    if (!requireLogin()) return;
+    if (API_CONFIG.useMock) {
+      toast('开发模式暂不支持添加好友，请切换正式后端');
+      return;
+    }
+    try {
+      await apiRequest('/api/friends/request', {
+        method: 'POST',
+        body: JSON.stringify({ userId: Number(userId), message: '' })
+      });
+      toast('好友申请已发送给 ' + nick);
+    } catch (e) {
+      toast(e.message || '申请失败');
+    }
+  },
+
+  async accept(reqId) {
+    if (API_CONFIG.useMock) return;
+    try {
+      await apiRequest('/api/friends/requests/' + reqId + '/accept', { method: 'POST' });
+      toast('已添加好友');
+      Friends.loadAll();
+    } catch (e) { toast(e.message || '操作失败'); }
+  },
+
+  async reject(reqId) {
+    if (API_CONFIG.useMock) return;
+    try {
+      await apiRequest('/api/friends/requests/' + reqId + '/reject', { method: 'POST' });
+      toast('已拒绝申请');
+      Friends.loadAll();
+    } catch (e) { toast(e.message || '操作失败'); }
+  }
+};
+
+/* ════════════════════════════════════════════════════════════════
+   5.3 Chat 模块（聊天室：本地模拟 + 后端对接）
 ════════════════════════════════════════════════════════════════ */
 const Chat = {
   currentConvId: null,
 
+  /* 从后端加载会话列表（useMock=false 时由 ChatCache 接管数据） */
+  async loadConversations() {
+    if (API_CONFIG.useMock) return;
+    try {
+      const res = await apiRequest('/api/chat/conversations');
+      const convs = (res.conversations || []).map(mapServerConv);
+      const cache = window.ChatCache || { convs: [], msgs: [] };
+      cache.convs = convs;
+      // 保留本地未读数（会话 id 匹配）
+      window.ChatCache = cache;
+      Render.chatList();
+      Render.chatWindow();
+    } catch (e) {
+      console.warn('[Chat] 加载会话失败', e);
+    }
+  },
+
+  /* 与某用户创建/打开私聊会话（玩家广场/好友列表发起） */
+  async startConversation(userId) {
+    const me = Data.getCurrentUser();
+    if (!me) { toast('请先登录'); navigate('auth'); return; }
+    if (API_CONFIG.useMock) {
+      const convs = Data.getChatConvs();
+      let conv = convs.find(c => c.peerId === String(userId));
+      if (!conv) {
+        conv = { id: 'conv' + Date.now(), peerId: String(userId), name: '玩家#' + userId, avatar: '🧑', lastTime: 0, unread: 0 };
+        convs.push(conv);
+        Data.saveChatConvs(convs);
+      }
+      this.openConv(conv.id);
+      return;
+    }
+    try {
+      const res = await apiRequest('/api/chat/conversations', {
+        method: 'POST',
+        body: JSON.stringify({ userId })
+      });
+      const conv = mapServerConv(res.conversation);
+      const cache = window.ChatCache || { convs: [], msgs: [] };
+      const exist = cache.convs.findIndex(c => c.id === conv.id);
+      if (exist >= 0) cache.convs[exist] = conv; else cache.convs.unshift(conv);
+      window.ChatCache = cache;
+      await this.loadMessages(conv.id);
+      this.openConv(conv.id);
+    } catch (e) {
+      toast(e.message || '创建会话失败');
+    }
+  },
+
+  /* 加载某会话消息到 ChatCache */
+  async loadMessages(convId) {
+    if (API_CONFIG.useMock) return;
+    try {
+      const res = await apiRequest('/api/chat/conversations/' + convId + '/messages?limit=100');
+      const msgs = (res.messages || []).map(mapServerMsg);
+      const cache = window.ChatCache || { convs: [], msgs: [] };
+      cache.msgs = cache.msgs.filter(m => m.convId !== String(convId)).concat(msgs);
+      window.ChatCache = cache;
+    } catch (e) {
+      console.warn('[Chat] 加载消息失败', e);
+    }
+  },
+
   /* 打开 / 切换会话 */
-  openConv(convId) {
+  async openConv(convId) {
     this.currentConvId = convId;
     const convs = Data.getChatConvs();
     const conv = convs.find(c => c.id === convId);
@@ -2708,6 +3033,7 @@ const Chat = {
       conv.unread = 0;
       Data.saveChatConvs(convs);
     }
+    if (!API_CONFIG.useMock) await this.loadMessages(convId);
     // 移动端：进入聊天窗口
     if (window.innerWidth <= 860) {
       $('#chatSidebar').classList.remove('visible');
@@ -2718,11 +3044,24 @@ const Chat = {
   },
 
   /* 发送文字消息 */
-  sendText(text) {
+  async sendText(text) {
     const me = Data.getCurrentUser();
     if (!me || !this.currentConvId) return;
     const content = text.trim();
     if (!content) return;
+    if (!API_CONFIG.useMock) {
+      try {
+        const res = await apiRequest('/api/chat/conversations/' + this.currentConvId + '/messages', {
+          method: 'POST',
+          body: JSON.stringify({ content, type: 'text' })
+        });
+        const m = mapServerMsg(res.message);
+        this.pushMessage(m);
+      } catch (e) {
+        toast(e.message || '发送失败');
+      }
+      return;
+    }
     this.pushMessage({
       convId: this.currentConvId,
       from: 'me',
@@ -2731,16 +3070,36 @@ const Chat = {
       content,
       time: Date.now()
     });
-    if (API_CONFIG.useMock) {
-      // 本地模拟：对方自动回复，制造"实时"感
-      setTimeout(() => this.mockReply(this.currentConvId), 1200 + Math.random() * 1200);
-    }
+    // 本地模拟：对方自动回复，制造"实时"感
+    setTimeout(() => this.mockReply(this.currentConvId), 1200 + Math.random() * 1200);
   },
 
-  /* 发送图片消息（base64 本地预览；真实后端改为上传后存 URL） */
-  sendImage(file) {
+  /* 发送图片消息（真实后端先上传拿 URL，再发消息） */
+  async sendImage(file) {
     const me = Data.getCurrentUser();
     if (!me || !this.currentConvId) return;
+    if (!API_CONFIG.useMock) {
+      try {
+        const fd = new FormData();
+        fd.append('file', file);
+        const token = Data.getSession() ? Data.getSession().token : '';
+        const up = await fetch(API_CONFIG.BASE_URL + '/api/upload', {
+          method: 'POST',
+          headers: token ? { Authorization: 'Bearer ' + token } : {},
+          body: fd
+        });
+        const upRes = await up.json();
+        if (!up.ok) throw new Error(upRes.error || '上传失败');
+        const res = await apiRequest('/api/chat/conversations/' + this.currentConvId + '/messages', {
+          method: 'POST',
+          body: JSON.stringify({ content: upRes.url, type: 'image' })
+        });
+        this.pushMessage(mapServerMsg(res.message));
+      } catch (e) {
+        toast(e.message || '图片发送失败');
+      }
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       this.pushMessage({
@@ -2755,10 +3114,22 @@ const Chat = {
     reader.readAsDataURL(file);
   },
 
-  /* 发送语音消息（模拟录音：存时长与虚拟波形） */
-  sendVoice(duration) {
+  /* 发送语音消息（真实后端走 REST，仅保存时长占位；本地模拟存时长与虚拟波形） */
+  async sendVoice(duration) {
     const me = Data.getCurrentUser();
     if (!me || !this.currentConvId || duration < 0.5) return;
+    if (!API_CONFIG.useMock) {
+      try {
+        const res = await apiRequest('/api/chat/conversations/' + this.currentConvId + '/messages', {
+          method: 'POST',
+          body: JSON.stringify({ content: '', type: 'voice', duration: Math.round(duration) })
+        });
+        this.pushMessage(mapServerMsg(res.message));
+      } catch (e) {
+        toast(e.message || '语音发送失败');
+      }
+      return;
+    }
     this.pushMessage({
       convId: this.currentConvId,
       from: 'me',
@@ -2773,8 +3144,10 @@ const Chat = {
   /* 写入一条消息并刷新界面 */
   pushMessage(msg) {
     const msgs = Data.getChatMsgs();
-    msgs.push({ id: Store.uid(), ...msg });
-    Data.saveChatMsgs(msgs);
+    if (!msgs.some(x => x.id === msg.id)) {
+      msgs.push({ id: Store.uid(), ...msg });
+      Data.saveChatMsgs(msgs);
+    }
     const convs = Data.getChatConvs();
     const conv = convs.find(c => c.id === msg.convId);
     if (conv) {
@@ -2819,6 +3192,36 @@ const Chat = {
   }
 };
 
+/* ── 服务端数据 → 前端会话/消息映射（useMock=false） ── */
+function mapServerConv(c) {
+  const other = c.otherUser || {};
+  return {
+    id: String(c.id),
+    peerId: other.id != null ? String(other.id) : '',
+    name: other.nickname || other.username || c.name || '未知玩家',
+    avatar: other.avatar || '🧑',
+    lastTime: 0,
+    unread: 0,
+    msgCount: c.messageCount || 0
+  };
+}
+function mapServerMsg(m) {
+  const me = Data.getCurrentUser();
+  const s = m.sender || {};
+  const mine = me && (String(s.id) === String(me.id) || String(m.senderId) === String(me.id));
+  return {
+    id: String(m.id),
+    convId: String(m.conversationId),
+    from: mine ? 'me' : (s.nickname || s.username || '玩家'),
+    avatar: s.avatar || (mine ? (me.avatar || '🧑') : '🧑'),
+    type: m.type || 'text',
+    content: m.content || '',
+    duration: m.duration || 0,
+    time: m.createdAt ? new Date(String(m.createdAt).replace(' ', 'T')).getTime() : Date.now(),
+    fromRole: s.role || 'user'
+  };
+}
+
 /* WebSocket 预留：useMock=false 时建立实时连接，接收服务端推送 */
 function initChatSocket() {
   if (API_CONFIG.useMock) return null;
@@ -2831,8 +3234,14 @@ function initChatSocket() {
     ws.onmessage = (ev) => {
       try {
         const data = JSON.parse(ev.data);
-        // 服务端推送格式：{ convId, from, avatar, type, content, duration, time }
-        Chat.pushMessage(data);
+        // 后端推送格式：{ type:'message', message:{...} }；兼容旧格式 { convId, from, ... }
+        if (data.type === 'message' && data.message) {
+          const m = mapServerMsg(data.message);
+          if (m.convId && !m.convId.startsWith('undefined')) Chat.pushMessage(m);
+          else Chat.loadConversations();
+        } else if (data.convId) {
+          Chat.pushMessage(data);
+        }
       } catch (e) { console.warn('[Chat] 消息解析失败', e); }
     };
     ws.onclose = () => console.info('[Chat] WebSocket 已断开');
@@ -2969,18 +3378,28 @@ function openModal(overlayId) { $(overlayId).classList.add('open'); document.bod
 function closeModal(overlayId) { $(overlayId).classList.remove('open'); document.body.style.overflow = ''; }
 
 function renderPostModal(postId) {
+  if (!API_CONFIG.useMock) {
+    loadServerPostDetail(postId).then(p => renderPostModalInner(p)).catch(err => toast(err.message || '加载失败'));
+    return;
+  }
   const posts = Data.getPosts();
   const post = posts.find(p => p.id === postId);
   if (!post) return;
+  renderPostModalInner(post);
+}
+
+function renderPostModalInner(post) {
   const myProfile = Data.getProfile();
   const liked = (post.likes || []).includes(myProfile.nick);
   const comments = post.comments || [];
+  const official = !API_CONFIG.useMock ? (post.authorRole === 'admin' || post.authorRole === 'ADMIN') : post.author === '官方';
+  const likeCount = post.likeCount != null ? post.likeCount : (post.likes || []).length;
   $('#postModal').innerHTML = `
     <div class="modal-head">
       <div class="post-head" style="margin-bottom:0;">
         <span class="avatar" aria-hidden="true">${post.avatar || '🧑'}</span>
         <div>
-          <div class="post-author">${escapeHtml(post.author)}</div>
+          <div class="post-author">${escapeHtml(post.author)}${official ? ' <span class="official-badge">官方</span>' : ''}</div>
           <div class="post-time">${fmtTime(post.time)}</div>
         </div>
       </div>
@@ -2990,7 +3409,7 @@ function renderPostModal(postId) {
     <div style="white-space:pre-wrap; color:var(--fg); line-height:1.75; margin-bottom:16px;">${escapeHtml(post.content)}</div>
     <div class="post-foot" style="margin-bottom:16px;">
       <button class="action-btn${liked ? ' liked' : ''}" data-action="like-post" data-post-id="${post.id}" aria-label="点赞">
-        <span aria-hidden="true">👍</span> <span data-role="like-count">${(post.likes || []).length}</span>
+        <span aria-hidden="true">👍</span> <span data-role="like-count">${likeCount}</span>
       </button>
       <span class="meta">${comments.length} 条评论</span>
     </div>
@@ -3008,6 +3427,7 @@ function renderPostModal(postId) {
         <button class="btn btn-primary btn-sm" type="submit">发送</button>
       </div>
     </form>`;
+  $('#postModal').dataset.postId = String(post.id);
   openModal('#postModalOverlay');
 }
 
@@ -3108,6 +3528,22 @@ function handleAction(e) {
   else if (action === 'open-msg') {
     renderMsgModal(el.dataset.playerId, el.dataset.playerNick, el.dataset.playerAvatar);
   }
+  else if (action === 'add-friend') {
+    Friends.sendRequest(el.dataset.playerId, el.dataset.playerNick);
+  }
+  else if (action === 'accept-friend') {
+    Friends.accept(el.dataset.reqId);
+  }
+  else if (action === 'reject-friend') {
+    Friends.reject(el.dataset.reqId);
+  }
+  else if (action === 'chat-friend') {
+    Chat.startConversation(el.dataset.uid);
+  }
+  else if (action === 'refresh-friends') {
+    Friends.loadAll();
+    Chat.loadConversations();
+  }
   else if (action === 'edit-profile') {
     renderProfileModal();
   }
@@ -3130,6 +3566,20 @@ function handleAction(e) {
 
 function toggleLike(postId) {
   if (!requireLogin()) return;
+  if (!API_CONFIG.useMock) {
+    apiRequest('/api/posts/' + postId + '/like', { method: 'POST' })
+      .then(res => {
+        const post = (window.ServerPosts || []).find(p => String(p.id) === String(postId));
+        if (post) {
+          post.likeCount = res.likeCount;
+          post.likes = res.liked ? [Data.getProfile().nick] : [];
+        }
+        Render.posts();
+        if ($('#postModalOverlay').classList.contains('open') && $('#postModal').dataset.postId === String(postId)) renderPostModal(postId);
+      })
+      .catch(err => toast(err.message || '操作失败'));
+    return;
+  }
   const posts = Data.getPosts();
   const post = posts.find(p => p.id === postId);
   if (!post) return;
@@ -3149,6 +3599,18 @@ function toggleLike(postId) {
 
 function deletePost(postId) {
   if (!requireLogin()) return;
+  if (!API_CONFIG.useMock) {
+    if (!confirm('确定删除这篇帖子吗？')) return;
+    apiRequest('/api/posts/' + postId, { method: 'DELETE' })
+      .then(() => {
+        window.ServerPosts = (window.ServerPosts || []).filter(p => String(p.id) !== String(postId));
+        Render.posts();
+        closeModal('#postModalOverlay');
+        toast('帖子已删除');
+      })
+      .catch(err => toast(err.message || '删除失败'));
+    return;
+  }
   const posts = Data.getPosts();
   const post = posts.find(p => p.id === postId);
   const myProfile = Data.getProfile();
@@ -3175,13 +3637,27 @@ function toggleFollow(playerId) {
 
 /* ─── 表单提交 ─── */
 function bindForms() {
-  $('#postForm').addEventListener('submit', (e) => {
+  $('#postForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!requireLogin()) return;
     const title = $('#postTitle').value.trim();
     const content = $('#postContent').value.trim();
     if (!title || !content) { toast('请填写标题和内容'); return; }
     const profile = Data.getProfile();
+    if (!API_CONFIG.useMock) {
+      try {
+        await apiRequest('/api/posts', {
+          method: 'POST',
+          body: JSON.stringify({ title, content })
+        });
+        $('#postForm').reset();
+        Render.posts();
+        toast('帖子已发布');
+      } catch (err) {
+        toast(err.message || '发布失败');
+      }
+      return;
+    }
     const posts = Data.getPosts();
     posts.push({
       id: Store.uid(),
@@ -3213,6 +3689,17 @@ function bindForms() {
         const overlay = form.closest('.modal-overlay');
         const postId = $('#postModal').querySelector('.post-head') ? ($('#postModal').dataset.postId || '') : '';
         if (!postId) { toast('找不到帖子'); return; }
+        if (!API_CONFIG.useMock) {
+          apiRequest('/api/posts/' + postId + '/comments', {
+            method: 'POST',
+            body: JSON.stringify({ content })
+          }).then(() => {
+            input.value = '';
+            renderPostModal(postId);
+            toast('评论已发布');
+          }).catch(err => toast(err.message || '评论失败'));
+          return;
+        }
         const posts = Data.getPosts();
         const post = posts.find(p => p.id === postId);
         if (!post) return;
@@ -3231,41 +3718,57 @@ function bindForms() {
           const channel = channelEl ? channelEl.value : 'phone';
           const target = $('#loginCodeTarget').value.trim();
           const code = $('#loginCode').value.trim();
+          const captchaCode = $('#loginCodeCaptcha').value.trim();
           if (!target) { toast('请输入手机号或邮箱'); return; }
           if (channel === 'phone' && !/^1[3-9]\d{9}$/.test(target)) { toast('手机号格式不正确'); return; }
           if (channel === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)) { toast('邮箱格式不正确'); return; }
           if (!/^\d{4,6}$/.test(code)) { toast('请输入正确的验证码'); return; }
+          if (!captchaCode) { toast('请输入图形验证码'); return; }
           try {
-            const user = await Auth.loginByCode(channel, target, code);
+            const user = await Auth.loginByCode(channel, target, code, Auth.captcha.captchaId, captchaCode);
             await Auth.refreshMe(user);
             syncProfileFromUser(user);
             Render.navUser();
             Render.myProfile();
             Render.players();
             Render.posts();
-            $('#postAsLabel').textContent = `发布为：${user.nick}`;
+            Friends.loadAll();
+            Chat.loadConversations();
+            loadServerPlayers();
+            const official = user.role === 'admin' || user.role === 'ADMIN';
+            $('#postAsLabel').textContent = `发布为：${official ? '官方' : '玩家'}`;
             toast('登录成功，欢迎回来！');
             navigate('home');
           } catch (err) {
+            Auth.loadCaptcha();
+            $('#loginCodeCaptcha').value = '';
             toast(err.message || '验证码登录失败');
           }
           return;
         }
         const account = $('#loginAccount').value.trim();
         const password = $('#loginPassword').value;
+        const loginCaptchaCode = $('#loginCaptcha').value.trim();
         if (!account || !password) { toast('请输入账号和密码'); return; }
+        if (!loginCaptchaCode) { toast('请输入图形验证码'); return; }
         try {
-          const user = await Auth.login(account, password);
+          const user = await Auth.login(account, password, Auth.captcha.captchaId, loginCaptchaCode);
           await Auth.refreshMe(user);
           syncProfileFromUser(user);
           Render.navUser();
           Render.myProfile();
           Render.players();
           Render.posts();
-          $('#postAsLabel').textContent = `发布为：${user.nick}`;
+          Friends.loadAll();
+          Chat.loadConversations();
+          loadServerPlayers();
+          const official = user.role === 'admin' || user.role === 'ADMIN';
+          $('#postAsLabel').textContent = `发布为：${official ? '官方' : '玩家'}`;
           toast('登录成功，欢迎回来！');
           navigate('home');
         } catch (err) {
+          Auth.loadCaptcha();
+          $('#loginCaptcha').value = '';
           toast(err.message || '登录失败');
         }
       }
@@ -3277,28 +3780,36 @@ function bindForms() {
         const email = $('#regEmail').value.trim();
         const password = $('#regPassword').value;
         const confirm = $('#regConfirm').value;
+        const regCaptchaCode = $('#regCaptcha').value.trim();
         if (!nick || !account || !password) { toast('请填写昵称、用户名和密码'); return; }
         if (account.length < 3) { toast('用户名至少 3 位'); return; }
         if (password.length < 6) { toast('密码至少 6 位'); return; }
         if (password !== confirm) { toast('两次输入的密码不一致'); return; }
         if (phone && !/^1[3-9]\d{9}$/.test(phone)) { toast('手机号格式不正确'); return; }
         if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('邮箱格式不正确'); return; }
+        if (!regCaptchaCode) { toast('请输入图形验证码'); return; }
         const picked = form.querySelector('[data-avatar].picked') || form.querySelector('[data-avatar]');
         const colorPicked = form.querySelector('[data-color].picked') || form.querySelector('[data-color]');
         const avatar = picked ? picked.dataset.avatar : '🧑';
         const color = colorPicked ? colorPicked.dataset.color : '#00d67d';
         try {
-          const user = await Auth.register({ nick, account, phone, email, password, avatar, color });
+          const user = await Auth.register({ nick, account, phone, email, password, avatar, color, captchaId: Auth.captcha.captchaId, captchaCode: regCaptchaCode });
           await Auth.refreshMe(user);
           syncProfileFromUser(user);
           Render.navUser();
           Render.myProfile();
           Render.players();
           Render.posts();
-          $('#postAsLabel').textContent = `发布为：${user.nick}`;
+          Friends.loadAll();
+          Chat.loadConversations();
+          loadServerPlayers();
+          const official = user.role === 'admin' || user.role === 'ADMIN';
+          $('#postAsLabel').textContent = `发布为：${official ? '官方' : '玩家'}`;
           toast('注册成功，已自动登录！');
           navigate('home');
         } catch (err) {
+          Auth.loadCaptcha();
+          $('#regCaptcha').value = '';
           toast(err.message || '注册失败');
         }
       }
@@ -3341,7 +3852,9 @@ function bindForms() {
         Render.myProfile();
         Render.players();
         Render.posts();
-        $('#postAsLabel').textContent = `发布为：${updated.nick}`;
+        const cur = Data.getCurrentUser();
+        const official = cur && (cur.role === 'admin' || cur.role === 'ADMIN');
+        $('#postAsLabel').textContent = `发布为：${official ? '官方' : '玩家'}`;
         toast('资料已保存');
       }
     }
@@ -3418,6 +3931,13 @@ function bindGlobal() {
         btn.textContent = sec + 's 后重发';
       }
     }, 1000);
+  });
+  /* ── Auth：图形验证码（点击图片刷新） ── */
+  document.addEventListener('click', (e) => {
+    const img = e.target.closest('.captcha-img');
+    if (img) {
+      Auth.loadCaptcha();
+    }
   });
   /* ── Auth：第三方品牌登录 ── */
   $$('[data-oauth]').forEach(btn => {
@@ -3599,6 +4119,12 @@ function navigate(name) {
   location.hash = name;
   window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
   if (name === 'players') Render.players();
+  if (name === 'community') {
+    Render.posts();
+    Render.friendPanel();
+    Friends.loadAll();
+    Chat.loadConversations();
+  }
   if (name === 'chat') {
     Render.chatList();
     Render.chatWindow();
@@ -3630,7 +4156,8 @@ function routeFromHash() {
       Render.myProfile();
       Render.players();
       Render.posts();
-      $('#postAsLabel').textContent = `发布为：${user ? user.nick : Data.getProfile().nick}`;
+      const official = user && (user.role === 'admin' || user.role === 'ADMIN');
+      $('#postAsLabel').textContent = `发布为：${official ? '官方' : '玩家'}`;
       toast('第三方登录成功！');
     }
     return;
@@ -3664,6 +4191,7 @@ function init() {
   $('#postAsLabel').textContent = `发布为：${Data.getProfile().nick}`;
   switchAuthTab('login');
   initChatSocket();
+  Auth.loadCaptcha();
   routeFromHash();
 }
 
